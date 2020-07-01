@@ -15,7 +15,7 @@ class AmigoPerformancePlugin{
 
     function __construct()
     {
-        add_action( 'admin_menu', array($this , 'amigoperformance_register_menu') );
+        add_action('admin_menu', array($this, 'amigoperformance_add_pages'));
     }
 
     function amigoperformance_activate()
@@ -32,17 +32,22 @@ class AmigoPerformancePlugin{
     {
         # code...
     }
-    function amigoperformance_register_menu() {
+
+    // Register Menu Page
+    function amigoperformance_add_pages() {        
         add_menu_page(
-            __( 'Amigo Performance', 'textdomain' ),
-            'AmigoPerf',
-            'manage_options',
-            plugins_url('amigoPerformance-admin.php', __FILE__),
-            '',
-            'dashicons-buddicons-activity',
-            // plugins_url( 'amigo-performance/assets/imag/icon3.png' ),
-            6
+            __('Amigo Perf Page','amigoperf-menupage'), //Page title
+            __('Amigo Perf','amigoperf-menu'), //Menu title
+            'manage_options', //capability
+            'amigo-perf-handle', //menu_slug
+            array($this, 'amigoperformance_toplevel_page'), //function
+            'dashicons-buddicons-activity' //icon url
         );
+    }
+
+    // Displays the page content for the custom Toplevel menu
+    function amigoperformance_toplevel_page() {
+        echo "<h2>" . __( 'Amigo Performance', 'amigoperf-menu' ) . "</h2>";
     }
 
     // Enqueue Style sheets
@@ -66,6 +71,7 @@ class AmigoPerformancePlugin{
 if (class_exists('AmigoPerformancePlugin')) {
     $amigoperformanceplugin = new AmigoPerformancePlugin();
     $amigoperformanceplugin -> amigoperformance_register();
+    // $amigoperformanceplugin -> amigoperformance_toplevel_page();
 }
 
 // Activation
