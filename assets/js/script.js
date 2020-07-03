@@ -1,1 +1,1 @@
-// Main JS - Amigo Performance
+// Amigo Performance Main JS

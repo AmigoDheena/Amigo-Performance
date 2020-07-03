@@ -10,7 +10,6 @@
 if (!defined('ABSPATH')) {
     die;
 }
-
 class AmigoPerformancePlugin{
 
     function __construct()
@@ -47,23 +46,19 @@ class AmigoPerformancePlugin{
 
     // Displays the page content for the custom Toplevel menu
     function amigoperformance_toplevel_page() {
-        echo "<h2>" . __( 'Amigo Performance', 'amigoperf-menu' ) . "</h2>";
+        // echo "<h2>" . __( 'Amigo Performance', 'amigoperf-menu' ) . "</h2>";
+        include 'amigo-performance-admin.php';
     }
 
-    // Enqueue Style sheets
+    // Enqueue Style sheets and Scripts
     function amigoperformance_enqueue_style(){
         wp_enqueue_style('amigoperf_style', plugins_url('assets/css/style.css',__FILE__));
-    }
-    
-    // Enqueue Scripts
-    function amigoperformance_enqueue_script(){
         wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__));
     }
 
     // Register Style sheets and Scripts
     function amigoperformance_register(){
         add_action('admin_enqueue_scripts', array($this , 'amigoperformance_enqueue_style'));
-        add_action('admin_enqueue_scripts', array($this , 'amigoperformance_enqueue_script'));
     }
 
 }
@@ -71,7 +66,6 @@ class AmigoPerformancePlugin{
 if (class_exists('AmigoPerformancePlugin')) {
     $amigoperformanceplugin = new AmigoPerformancePlugin();
     $amigoperformanceplugin -> amigoperformance_register();
-    // $amigoperformanceplugin -> amigoperformance_toplevel_page();
 }
 
 // Activation
