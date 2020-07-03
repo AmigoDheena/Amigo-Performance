@@ -1,4 +1,27 @@
 /* Amigo Performance Main Style */
-h1{
+.amperf-header h1{
     text-align: center;
+}
+.amperf-container {
+    max-width: 1500px;
+    margin: auto;
+    /* border: 2px solid lightgray; */
+}
+
+#formid{
+    max-width: 1200px;
+    margin: auto;
+    border: 3px solid green;
+    padding: 15px;
+}
+.amperf-submitbtn{
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.amperf-submitbtn:hover{
+    background-color: #46a049;
 }

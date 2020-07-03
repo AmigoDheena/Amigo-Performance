@@ -7,6 +7,15 @@
 
     class AmigoPerfAdmin{        
         public $amigoPerf_hfn = 'amigoPerf_hfn'; //hidden field name
+        
+        public function __construct(){
+            if($this->amigoPerf_rqs_opt == get_option($this->amigoPerf_rqs)) {
+                if(!is_admin()) {
+                    add_filter( 'style_loader_src', array($this,'amigoPerf_rqs_query'), 10, 2 );
+                    add_filter( 'script_loader_src', array($this,'amigoPerf_rqs_query'), 10, 2 );
+                }
+            }
+        }
 
         public function amigoPerf_Default(){
             global $amigoPerf_rqs_opt;
@@ -23,25 +32,35 @@
                 flush_rewrite_rules();
             }
         }
+
+        public function amigoPerf_rqs_query($src)
+        {           
+            if(strpos( $src, '?ver=' ))
+                $src = remove_query_arg( 'ver', $src );
+                echo "SRCC".$src;
+            return $src;
+        }
     }
     $amigoPerfDefault = new AmigoPerfAdmin();
     $amigoPerfDefault ->amigoPerf_Default();
     $amigoPerfDefault -> amigoperf_hiddenField();
+    $amigoPerfDefault -> amigoPerf_rqs_query('details');
+
 ?>
 
-<div class='container'>
+<div class='amperf-container'>
 
     <div class= 'amperf-header'>
         <h1> <?php echo $PluginName?> </h1>
     </div>
 
-<form method="post">
-    <input type="hidden" name="<?php echo $amigoPerfDefault->amigoPerf_hfn; ?>" value="Y">
-    <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" name="<?php echo $amigoPerfDefault->amigoPerf_rqs; ?>" value="<?php echo $amigoPerfDefault->amigoPerf_rqs_opt ?>" <?php if($amigoPerfDefault->amigoPerf_rqs_opt == get_option($amigoPerfDefault->amigoPerf_rqs)) echo 'checked="checked"'; ?> <?php checked($amigoPerfDefault->amigoPerf_rqs_val, 'on',true) ?> >
-        <label class="custom-control-label" for="<?php echo $amigoPerfDefault->amigoPerf_rqs; ?>" <?php esc_attr_e('Remove query strings from static content', 'Amigo-Performance'); ?>>Remove Query Strings</label>
-    </div>
-    <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" name="submit">
-</form>
+    <form method="post" id="formid">
+        <input type="hidden" name="<?php echo $amigoPerfDefault->amigoPerf_hfn; ?>" value="Y">
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" name="<?php echo $amigoPerfDefault->amigoPerf_rqs; ?>" value="<?php echo $amigoPerfDefault->amigoPerf_rqs_opt ?>" <?php if($amigoPerfDefault->amigoPerf_rqs_opt == get_option($amigoPerfDefault->amigoPerf_rqs)) echo 'checked="checked"'; ?> <?php checked($amigoPerfDefault->amigoPerf_rqs_val, 'on',true) ?> >
+            <label class="custom-control-label" for="<?php echo $amigoPerfDefault->amigoPerf_rqs; ?>" <?php esc_attr_e('Remove query strings from static content', 'Amigo-Performance'); ?>>Remove Query Strings</label>
+        </div>
+        <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" class="amperf-submitbtn" name="submit">
+    </form>
 
 </div>
