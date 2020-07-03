@@ -10,11 +10,14 @@
 if (!defined('ABSPATH')) {
     die;
 }
+
+include_once 'amigo-performance-admin.php';
+
 class AmigoPerformancePlugin{
 
     function __construct()
     {
-        add_action('admin_menu', array($this, 'amigoperformance_add_pages'));
+        // add_action('admin_menu', array($this, 'amigoPerf_menu'));
     }
 
     function amigoperformance_activate()
@@ -30,24 +33,6 @@ class AmigoPerformancePlugin{
     function amigoperformance_uninstall()
     {
         # code...
-    }
-
-    // Register Menu Page
-    function amigoperformance_add_pages() {        
-        add_menu_page(
-            __('Amigo Perf Page','amigoperf-menupage'), //Page title
-            __('Amigo Perf','amigoperf-menu'), //Menu title
-            'manage_options', //capability
-            'amigo-perf-handle', //menu_slug
-            array($this, 'amigoperformance_toplevel_page'), //function
-            'dashicons-buddicons-activity' //icon url
-        );
-    }
-
-    // Displays the page content for the custom Toplevel menu
-    function amigoperformance_toplevel_page() {
-        // echo "<h2>" . __( 'Amigo Performance', 'amigoperf-menu' ) . "</h2>";
-        include 'amigo-performance-admin.php';
     }
 
     // Enqueue Style sheets and Scripts
