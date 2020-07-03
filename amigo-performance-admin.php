@@ -38,7 +38,7 @@
 <form method="post">
     <input type="hidden" name="<?php echo $amigoPerfDefault->amigoPerf_hfn; ?>" value="Y">
     <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" name="<?php echo $amigoPerfDefault->amigoPerf_rqs; ?>" <?php checked($amigoPerfDefault->amigoPerf_rqs_val, 'on',true) ?> >
+        <input type="checkbox" class="custom-control-input" name="<?php echo $amigoPerfDefault->amigoPerf_rqs; ?>" value="<?php echo $amigoPerfDefault->amigoPerf_rqs_opt ?>" <?php if($amigoPerfDefault->amigoPerf_rqs_opt == get_option($amigoPerfDefault->amigoPerf_rqs)) echo 'checked="checked"'; ?> <?php checked($amigoPerfDefault->amigoPerf_rqs_val, 'on',true) ?> >
         <label class="custom-control-label" for="<?php echo $amigoPerfDefault->amigoPerf_rqs; ?>" <?php esc_attr_e('Remove query strings from static content', 'Amigo-Performance'); ?>>Remove Query Strings</label>
     </div>
     <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" name="submit">
