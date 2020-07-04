@@ -53,7 +53,6 @@
 
         public function amigoPerf_rqs_operation()
         {
-            //Remove Query Strings
             if($this->amigoPerf_rqs_opt == get_option($this->amigoPerf_rqs)) {
                 if(!is_admin()) {                   
                     add_filter( 'style_loader_src', array($this,'amigoPerf_rqs_query'), 10, 2 );
@@ -73,15 +72,17 @@
         }
 
         public function amigoPerf_defer_operation(){
-            if(!is_admin()) {
-                add_filter( 'script_loader_tag', function ( $tag, $handle ) {
-                    if(is_front_page()) {
-                        if ( 'jquery-core' == $handle){ return $tag; } 
-                    } else {
-                       return $tag;
-                    }
-                    return str_replace( ' src', ' defer="defer" src', $tag );
-                }, 10, 2 );
+            if($this->amigoPerf_defer_opt == get_option($this->amigoPerf_defer)) {
+                if(!is_admin()) {
+                    add_filter( 'script_loader_tag', function ( $tag, $handle ) {
+                        if(is_front_page()) {
+                            if ( 'jquery-core' == $handle){ return $tag; } 
+                        } else {
+                        return $tag;
+                        }
+                        return str_replace( ' src', ' defer="defer" src', $tag );
+                    }, 10, 2 );
+                }
             }
         }
 
@@ -89,27 +90,29 @@
             <div class='amperf-container'>
 
                 <div class= 'amperf-header'>
-                    <h1> <?php echo $this->PluginName?><span> <?php echo $this->PluginVersion ?> </span> </h1>
-                    
+                    <h1> 
+                        <span class="dashicons dashicons-buddicons-activity amigoperf_icon"></span><?php echo $this->PluginName?>
+                        <span class="amigoperf_pluginversion"> <?php echo $this->PluginVersion ?></span> 
+                    </h1>                    
                 </div>
 
                 <form method="post" id="formid">
                     <input type="hidden" name="<?php echo $this->amigoPerf_hfn; ?>" value="Y">
 
-                    <div class="custom-control custom-checkbox">
+                    <label class="amigoPerf_lable">Remove Query String                        
                         <input type="checkbox" class="custom-control-input" name="<?php echo $this->amigoPerf_rqs; ?>" value="<?php echo $this->amigoPerf_rqs_opt ?>" <?php if($this->amigoPerf_rqs_opt == get_option($this->amigoPerf_rqs)) echo 'checked="checked"'; ?> <?php checked($this->amigoPerf_rqs_val, 'on',true) ?> >
-                        <label class="custom-control-label" for="<?php echo $this->amigoPerf_rqs; ?>" <?php esc_attr_e('Remove query strings from static content', 'Amigo-Performance'); ?>>Remove Query Strings</label>
-                    </div>
+                        <span class="checkmark"></span>
+                    </label>
 
-                    <div class="custom-control custom-checkbox">
+                    <label class="amigoPerf_lable">Remove Emoji
                         <input type="checkbox" class="custom-control-input" name="<?php echo $this->amigoPerf_remoji; ?>" value="<?php echo $this->amigoPerf_remoji_opt ?>" <?php if($this->amigoPerf_remoji_opt == get_option($this->amigoPerf_remoji)) echo 'checked="checked"'; ?> <?php checked($this->amigoPerf_remoji_val, 'on',true) ?> >
-                        <label class="custom-control-label" for="<?php echo $this->amigoPerf_remoji; ?>" <?php esc_attr_e('Remove Emoji', 'Amigo-Performance'); ?>>Remove Emoji</label>
-                    </div>
+                        <span class="checkmark"></span>
+                    </label>
 
-                    <div class="custom-control custom-checkbox">
+                    <label class="amigoPerf_lable">Defer parsing of JavaScript
                         <input type="checkbox" class="custom-control-input" name="<?php echo $this->amigoPerf_defer; ?>" value="<?php echo $this->amigoPerf_defer_opt ?>" <?php if($this->amigoPerf_defer_opt == get_option($this->amigoPerf_defer)) echo 'checked="checked"'; ?> <?php checked($this->amigoPerf_defer_val, 'on',true) ?> >
-                        <label class="custom-control-label" for="<?php echo $this->amigoPerf_defer; ?>" <?php esc_attr_e('Defer parsing of JavaScript', 'Amigo-Performance'); ?>>Defer parsing of JavaScript</label>
-                    </div>
+                        <span class="checkmark"></span>
+                    </label>
 
                     <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" class="amperf-submitbtn" name="submit">
                 </form>
