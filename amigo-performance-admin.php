@@ -55,7 +55,7 @@
         public function amigoPerf_rqs_query($src)
         {           
             if(strpos( $src, '?ver=' ))
-                $src = remove_query_arg( 'ver', $src );
+            $src = remove_query_arg( 'ver', $src );
             return $src;
         }
 
@@ -187,7 +187,9 @@
                         <input type="checkbox" class="custom-control-input" name="<?php echo $this->amigoPerf_iframelazy; ?>" value="<?php echo $this->amigoPerf_iframelazy_opt ?>" <?php if($this->amigoPerf_iframelazy_opt == get_option($this->amigoPerf_iframelazy)) echo 'checked="checked"'; ?> <?php checked($this->amigoPerf_iframelazy_val, 'on',true) ?> >
                         <span class="checkmark"></span>
                     </label>
-
+                    <?php
+                        add_action( 'wp_print_scripts', array($this,'amigoPerf_dequeue_css_js'), 101 );
+                    ?>
                     <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" class="amperf-submitbtn" name="submit">
                 </form>
 
@@ -201,10 +203,15 @@
                 __('Amigo Perf','amigoperf-menu'), //Menu title
                 'manage_options', //capability
                 'amigo-perf-handle', //menu_slug
-                array($this, 'amigoPerf_menu'), //function
+                // array($this, 'amigoPerf_menu'), //function
+                array($this, 'amigoPerf_newpage'), //function
                 'dashicons-buddicons-activity' //icon url
             );
         }
+        public function amigoPerf_newpage(){
+            require 'admin.php';
+        }
+
     }
     $amigoPerfDefault = new AmigoPerfAdmin();
     $amigoPerfDefault -> amigoPerf_Default();
@@ -213,5 +220,6 @@
     $amigoPerfDefault -> amigoPerf_rqs_operation(); //Remove Query Strings Operation
     $amigoPerfDefault -> amigoPerf_remoji_operation(); //Remove Emoji Operation
     $amigoPerfDefault -> amigoPerf_defer_operation(); //Defer parsing of JavaScript
-    $amigoPerfDefault -> amigoPerf_iframelazy_execute(); //Iframe Lazyload
+    $amigoPerfDefault -> amigoPerf_iframelazy_execute(); //Iframe Lazyload    
+    // $amigoPerfDefault -> amigoPerf_dequeue_css_js_operation(); //test
 ?>
