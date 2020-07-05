@@ -15,19 +15,22 @@
         }
 
         public function amigoPerf_Default(){
-            global $amigoPerf_rqs_opt, $amigoPerf_remoji_opt, $amigoPerf_defer_opt;
+            global $amigoPerf_rqs_opt, $amigoPerf_remoji_opt, $amigoPerf_defer_opt, $amigoPerf_iframelazy_opt;
 
             $this->amigoPerf_rqs_opt = ( FALSE !== get_option($this->amigoPerf_rqs) ? get_option($this->amigoPerf_rqs) : 'on'  ); 
             $this->amigoPerf_remoji_opt = ( FALSE !== get_option($this->amigoPerf_remoji) ? get_option($this->amigoPerf_remoji) : 'on'  ); 
             $this->amigoPerf_defer_opt = ( FALSE !== get_option($this->amigoPerf_defer) ? get_option($this->amigoPerf_defer) : 'on'  ); 
+            $this->amigoPerf_iframelazy_opt = ( FALSE !== get_option($this->amigoPerf_iframelazy) ? get_option($this->amigoPerf_iframelazy) : 'on'  ); 
 
             $this->amigoPerf_rqs = 'amigoPerf_rqs';
             $this->amigoPerf_remoji = 'amigoPerf_remoji';
             $this->amigoPerf_defer = 'amigoPerf_defer';
+            $this->amigoPerf_iframelazy = 'amigoPerf_iframelazy';
 
             $this->amigoPerf_rqs_val = $amigoPerf_rqs_opt;
             $this->amigoPerf_remoji_val = $amigoPerf_remoji_opt;
             $this->amigoPerf_defer_val = $amigoPerf_defer_opt;
+            $this->amigoPerf_iframelazy_val = $amigoPerf_iframelazy_opt;
         }
             
         public function amigoperf_hiddenField(){
@@ -35,10 +38,12 @@
                 $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? $_POST[$this->amigoPerf_rqs] : "off");
                 $this->amigoPerf_remoji_val = (isset($_POST[$this->amigoPerf_remoji]) ? $_POST[$this->amigoPerf_remoji] : "off");
                 $this->amigoPerf_defer_val = (isset($_POST[$this->amigoPerf_defer]) ? $_POST[$this->amigoPerf_defer] : "off");
+                $this->amigoPerf_iframelazy_val = (isset($_POST[$this->amigoPerf_iframelazy]) ? $_POST[$this->amigoPerf_iframelazy] : "off");
 
                 update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
                 update_option( $this->amigoPerf_remoji, $this->amigoPerf_remoji_val );
                 update_option( $this->amigoPerf_defer, $this->amigoPerf_defer_val );
+                update_option( $this->amigoPerf_iframelazy, $this->amigoPerf_iframelazy_val );
 
                 flush_rewrite_rules();
             }
@@ -86,6 +91,40 @@
             }
         }
 
+        public function amigoPerf_iframelazy_operation()
+        {
+            if($this->amigoPerf_iframelazy_opt == get_option($this->amigoPerf_iframelazy)) {
+                //Inline Footer
+                function inline_footer(){ ?>
+                    <!-- Allpage -->
+                    <script>
+                        /* 
+                        URL: https://github.com/AmigoDheena/amigolazy
+                        Author: Amigo Dheena
+                        */
+                        let amframe = document.querySelectorAll('.amigolazy');
+                        window.onload = function(){
+                            for(let i=0; i<amframe.length;i++){
+                                let amsrc = amframe[i];
+                                let amdata = amsrc.getAttribute("data-src");
+                                let datanew = amsrc.getAttribute("lazy");
+                                if(datanew === null){
+                                datanew = 1500;
+                                }
+                                setTimeout(function(){
+                                amframe[i].setAttribute("src",amdata);
+                                console.info(datanew + "ms Lazyloaded " + amframe[i].src);
+                                }, datanew);
+                            }
+                        }
+                    </script>
+                    <!-- Allpage -->
+                <?php }
+                //Inline Footer
+                add_action('wp_footer', 'inline_footer', 100);
+            }
+        }
+
         public function amigoPerf_menu(){ ?>
             <div class='amperf-container'>
 
@@ -114,6 +153,11 @@
                         <span class="checkmark"></span>
                     </label>
 
+                    <label class="amigoPerf_lable">Iframe Lazyload
+                        <input type="checkbox" class="custom-control-input" name="<?php echo $this->amigoPerf_iframelazy; ?>" value="<?php echo $this->amigoPerf_iframelazy_opt ?>" <?php if($this->amigoPerf_iframelazy_opt == get_option($this->amigoPerf_iframelazy)) echo 'checked="checked"'; ?> <?php checked($this->amigoPerf_iframelazy_val, 'on',true) ?> >
+                        <span class="checkmark"></span>
+                    </label>
+
                     <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" class="amperf-submitbtn" name="submit">
                 </form>
 
@@ -130,8 +174,7 @@
                 array($this, 'amigoPerf_menu'), //function
                 'dashicons-buddicons-activity' //icon url
             );
-        }
-        
+        }        
     }
     $amigoPerfDefault = new AmigoPerfAdmin();
     $amigoPerfDefault ->amigoPerf_Default();
@@ -140,4 +183,5 @@
     $amigoPerfDefault -> amigoPerf_rqs_operation(); //Remove Query Strings Operation
     $amigoPerfDefault -> amigoPerf_remoji_operation(); //Remove Emoji Operation
     $amigoPerfDefault -> amigoPerf_defer_operation(); //Defer parsing of JavaScript
+    $amigoPerfDefault -> amigoPerf_iframelazy_operation(); //Iframe Lazyload
 ?>
