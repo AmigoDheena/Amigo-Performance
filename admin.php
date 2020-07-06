@@ -2,8 +2,8 @@
 
     <div class= 'amperf-header'>
         <h1>
-            <span class="dashicons dashicons-buddicons-activity amigoperf_icon"></span><?php echo $this->PluginName?>
-            <span class="amigoperf_pluginversion"> <?php echo $this->PluginVersion ?></span> 
+            <span class="dashicons dashicons-buddicons-activity amigoperf_icon"></span><?php echo $this->amigoPerf_PluginName?>
+            <span class="amigoperf_pluginversion"> <?php echo $this->amigoPerf_PluginVersion ?></span> 
         </h1>
     </div>
 
