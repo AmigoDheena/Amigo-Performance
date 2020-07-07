@@ -1,10 +1,12 @@
 <?php
 /**
  * Plugin Name:       Amigo Performance
- * Description:       This is very useful to optimize your website
+ * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
+ * Description:       A WordPress Plugin to Optimize Website Performance and improve Site Score.
  * Version:           0.1
  * Author:            Amigo Dheena
  * Author URI:        https://www.amigodheena.xyz
+ * Text Domain:       amigo-performance
  */
 
 if (!defined('ABSPATH')) {
@@ -13,7 +15,7 @@ if (!defined('ABSPATH')) {
 
 include_once ( ABSPATH . 'wp-admin/includes/file.php' ); // to get get_home_path() function work
 include_once ( ABSPATH . 'wp-admin/includes/plugin.php' ); // to is_plugin_active()() function work
-
+    
 // Define plugin version for future releases
 if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
     define('AMIGOPERF_PLUGIN_VERSION', '0.1');
@@ -224,7 +226,6 @@ class AmigoPerformancePlugin{
             __('Amigo Perf','amigoperf-menu'), //Menu title
             'manage_options', //capability
             'amigo-perf-handle', //menu_slug
-            // array($this, 'amigoPerf_menu'), //function
             array($this, 'amigoPerf_newpage'), //function
             'dashicons-buddicons-activity' //icon url
         );
@@ -232,7 +233,6 @@ class AmigoPerformancePlugin{
 
     public function amigoPerf_newpage(){
         require 'admin.php';
-        // echo "YOOY";
     }
 
     function amigoPerf_reg_menu(){
