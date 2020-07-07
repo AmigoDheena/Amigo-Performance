@@ -11,10 +11,17 @@ if (!defined('ABSPATH')) {
     die;
 }
 
+include_once ( ABSPATH . 'wp-admin/includes/file.php' ); // to get get_home_path() function work
+include_once ( ABSPATH . 'wp-admin/includes/plugin.php' ); // to is_plugin_active()() function work
+
+// Define plugin version for future releases
+if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
+    define('AMIGOPERF_PLUGIN_VERSION', '0.1');
+}
+
 class AmigoPerformancePlugin{
     public $amigoPerf_hfn = 'amigoPerf_hfn'; //hidden field name
     public $amigoPerf_PluginName = 'Amigo Performance';
-    public $amigoPerf_PluginVersion = '0.1';
 
     function __construct()
     {
@@ -50,6 +57,8 @@ class AmigoPerformancePlugin{
     public function amigoPerf_Default(){
         global $amigoPerf_rqs_opt, $amigoPerf_remoji_opt, $amigoPerf_defer_opt, $amigoPerf_iframelazy_opt;
 
+        $this->amigoPerf_PluginVersion = ( get_option($this->amigoPerf_PluginVersion) ? get_option($this->amigoPerf_PluginVersion) : AMIGOPERF_PLUGIN_VERSION );
+
         $this->amigoPerf_rqs_opt = ( FALSE !== get_option($this->amigoPerf_rqs) ? get_option($this->amigoPerf_rqs) : 'on'  ); 
         $this->amigoPerf_rqs = 'amigoPerf_rqs';
         $this->amigoPerf_rqs_val = $amigoPerf_rqs_opt;
@@ -83,6 +92,26 @@ class AmigoPerformancePlugin{
 
             flush_rewrite_rules();
         }
+    }
+
+    // Check if plugin updated
+    function amigoPerf_update_checker() {
+        global $amigoPerf_PluginVersion;
+        if ($amigoPerf_PluginVersion != AMIGOPERF_PLUGIN_VERSION) {
+            if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
+                add_action( 'admin_notices', array($this,'amigoPerf_apply_updates_notice') );
+            }
+        }
+    }
+
+    // Display admin notice to apply changes in the occurrence of update (when plugin updated)
+    function amigoPerf_apply_updates_notice() {
+        $amigoPerf_notice_contents = "<p style=\"font-size: 15px; color: #FF9900;\">Amigo Performance has been updated to version: " . AMIGOPERF_PLUGIN_VERSION . "</p>";
+        $amigoPerf_notice_contents .= "<p><a href=\"options-general.php?page=Amigo-performance&apply-updates=true\" class=\"button button-primary\" style=\"font-size: 15px; color: #FFFFFF; font-weight: bold;\">Apply Changes</a></p>";
+
+        ?>
+        <div class="notice notice-success"><p><strong><?php _e($amigoPerf_notice_contents, 'Amigo-performance'); ?></strong></p></div>
+        <?php
     }
 
     public function amigoPerf_rqs_query($src)
@@ -225,8 +254,8 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoPerfDefault -> amigoPerf_defer_operation(); //Defer parsing of JavaScript
     $amigoPerfDefault -> amigoPerf_iframelazy_execute(); //Iframe Lazyload  
     $amigoPerfDefault -> amigoPerf_reg_menu(); //Register Menu
+    $amigoPerfDefault -> amigoPerf_update_checker(); //Update checker
 }
-
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
 
