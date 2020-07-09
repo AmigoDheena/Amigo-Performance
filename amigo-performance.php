@@ -32,7 +32,10 @@ class AmigoPerformancePlugin{
     
     function amigoperformance_activate()
     {
+        update_option( $this->amigoPerf_update_checker, AMIGOPERF_PLUGIN_VERSION );
+        return AMIGOPERF_PLUGIN_VERSION;
 
+        // $this->my_plugin_is_current_version();
     }
 
     function amigoperformance_deactivate()
@@ -43,6 +46,18 @@ class AmigoPerformancePlugin{
     function amigoperformance_uninstall()
     {
         # code...
+    }
+
+    // Check plugin versioin
+    function amigoPerf_update_checker() {        
+        $version = get_option( $this->amigoPerf_PluginVersion ); 
+        if( version_compare($version, AMIGOPERF_PLUGIN_VERSION , '<')) {
+            // Do some special things when we update to 2.0.0.
+        }
+    }
+
+    function my_plugin_is_current_version(){
+        return version_compare($this->version, AMIGOPERF_PLUGIN_VERSION, '=') ? true : false;
     }
 
     // Enqueue Style sheets and Scripts
@@ -94,26 +109,6 @@ class AmigoPerformancePlugin{
 
             flush_rewrite_rules();
         }
-    }
-
-    // Check if plugin updated
-    function amigoPerf_update_checker() {
-        global $amigoPerf_PluginVersion;
-        if ($amigoPerf_PluginVersion != AMIGOPERF_PLUGIN_VERSION) {
-            if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
-                add_action( 'admin_notices', array($this,'amigoPerf_apply_updates_notice') );
-            }
-        }
-    }
-
-    // Display admin notice to apply changes in the occurrence of update (when plugin updated)
-    function amigoPerf_apply_updates_notice() {
-        $amigoPerf_notice_contents = "<p style=\"font-size: 15px; color: #FF9900;\">Amigo Performance has been updated to version: " . AMIGOPERF_PLUGIN_VERSION . "</p>";
-        $amigoPerf_notice_contents .= "<p><a href=\"options-general.php?page=Amigo-performance&apply-updates=true\" class=\"button button-primary\" style=\"font-size: 15px; color: #FFFFFF; font-weight: bold;\">Apply Changes</a></p>";
-
-        ?>
-        <div class="notice notice-success"><p><strong><?php _e($amigoPerf_notice_contents, 'Amigo-performance'); ?></strong></p></div>
-        <?php
     }
 
     public function amigoPerf_rqs_query($src)
