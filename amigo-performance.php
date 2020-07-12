@@ -43,11 +43,6 @@ class AmigoPerformancePlugin{
         flush_rewrite_rules();
     }
 
-    function amigoperformance_uninstall()
-    {
-        # code...
-    }
-
     // Check plugin versioin
     function amigoPerf_update_checker() {        
         $version = get_option( $this->amigoPerf_PluginVersion ); 
