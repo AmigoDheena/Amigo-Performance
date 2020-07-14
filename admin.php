@@ -1,3 +1,9 @@
+<?php
+/**
+ * @package amigo-performance
+ */
+?>
+
 <div class='amperf-container'>
 
     <div class= 'amperf-header'>
