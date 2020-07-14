@@ -29,6 +29,11 @@ if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
 class AmigoPerformancePlugin{
     public $amigoPerf_hfn = 'amigoPerf_hfn'; //hidden field name
     public $amigoPerf_PluginName = 'Amigo Performance';
+    public $amigoPerf_PluginVersion;
+    public $amigoPerf_rqs;
+    public $amigoPerf_remoji;
+    public $amigoPerf_defer;
+    public $amigoPerf_iframelazy;
 
     function __construct()
     {
