@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @package amigo-performance
+ */
+
 /**
  * Plugin Name:       Amigo Performance
  * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
