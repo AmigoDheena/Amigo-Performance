@@ -2,9 +2,8 @@
 
 /**
  * @package amigo-performance
- */
-
-/**
+ * @author Amigo Dheena
+ 
  * Plugin Name:       Amigo Performance
  * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
  * Description:       A WordPress Plugin to Optimize Website Performance and improve Site Score.
