@@ -44,7 +44,6 @@ class AmigoPerformancePlugin{
         update_option( $this->amigoPerf_update_checker, AMIGOPERF_PLUGIN_VERSION );
         return AMIGOPERF_PLUGIN_VERSION;
 
-        // $this->my_plugin_is_current_version();
     }
 
     function amigoperformance_deactivate()
@@ -221,17 +220,19 @@ class AmigoPerformancePlugin{
    // Register Menu Page
     public function amigoperformance_add_pages() {
         add_menu_page(
-            __('Amigo Perf Page','amigoperf-menupage'), //Page title
-            __('Amigo Perf','amigoperf-menu'), //Menu title
+            'Amigo Performance Plugin', //Page title
+            'Amigo Perf', //Menu title
             'manage_options', //capability
-            'amigo-perf-handle', //menu_slug
+            'amigo_performance', //menu_slug
             array($this, 'amigoPerf_newpage'), //function
             'dashicons-buddicons-activity' //icon url
         );
     }
 
     public function amigoPerf_newpage(){
-        require 'admin.php';
+        require_once plugin_dir_path(__FILE__).'admin.php';
+        // require 'admin.php';
+        // echo $this->amigoPerf_PluginName;
     }
 
     function amigoPerf_reg_menu(){
