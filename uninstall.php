@@ -6,7 +6,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
   die;
 }
 
-if (!get_option('plugin_do_uninstall', false)) exit;
+// if (!get_option('plugin_do_uninstall', false)) exit;
 
 delete_option( 'amigoPerf_rqs' );
 delete_option( 'amigoPerf_remoji' );
