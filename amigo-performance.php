@@ -81,35 +81,35 @@ class AmigoPerformancePlugin{
 
         $this->amigoPerf_PluginVersion = ( get_option($this->amigoPerf_PluginVersion) ? get_option($this->amigoPerf_PluginVersion) : AMIGOPERF_PLUGIN_VERSION );
 
-        $this->amigoPerf_rqs_opt = ( FALSE !== get_option($this->amigoPerf_rqs) ? get_option($this->amigoPerf_rqs) : 'on'  ); 
+        $this->amigoPerf_rqs_opt = ( FALSE !== get_option($this->amigoPerf_rqs) ? get_option($this->amigoPerf_rqs) : TRUE  ); 
         $this->amigoPerf_rqs = 'amigoPerf_rqs';
         $this->amigoPerf_rqs_val = $amigoPerf_rqs_opt;
 
-        $this->amigoPerf_remoji_opt = ( FALSE !== get_option($this->amigoPerf_remoji) ? get_option($this->amigoPerf_remoji) : 'on'  ); 
+        $this->amigoPerf_remoji_opt = ( FALSE !== get_option($this->amigoPerf_remoji) ? get_option($this->amigoPerf_remoji) : TRUE  ); 
         $this->amigoPerf_remoji = 'amigoPerf_remoji';
         $this->amigoPerf_remoji_val = $amigoPerf_remoji_opt;
         
-        $this->amigoPerf_defer_opt = ( FALSE !== get_option($this->amigoPerf_defer) ? get_option($this->amigoPerf_defer) : 'on'  ); 
+        $this->amigoPerf_defer_opt = ( FALSE !== get_option($this->amigoPerf_defer) ? get_option($this->amigoPerf_defer) : TRUE  ); 
         $this->amigoPerf_defer = 'amigoPerf_defer';
         $this->amigoPerf_defer_val = $amigoPerf_defer_opt;
         
-        $this->amigoPerf_iframelazy_opt = ( FALSE !== get_option($this->amigoPerf_iframelazy) ? get_option($this->amigoPerf_iframelazy) : 'on'  ); 
+        $this->amigoPerf_iframelazy_opt = ( FALSE !== get_option($this->amigoPerf_iframelazy) ? get_option($this->amigoPerf_iframelazy) : TRUE  ); 
         $this->amigoPerf_iframelazy = 'amigoPerf_iframelazy';
         $this->amigoPerf_iframelazy_val = $amigoPerf_iframelazy_opt;
     }
         
     public function amigoperf_hiddenField(){
         if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] == 'Y') {
-            $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? $_POST[$this->amigoPerf_rqs] : "off");
+            $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? $_POST[$this->amigoPerf_rqs] : (bool)FALSE);
             update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
 
-            $this->amigoPerf_remoji_val = (isset($_POST[$this->amigoPerf_remoji]) ? $_POST[$this->amigoPerf_remoji] : "off");
+            $this->amigoPerf_remoji_val = (isset($_POST[$this->amigoPerf_remoji]) ? $_POST[$this->amigoPerf_remoji] : FALSE);
             update_option( $this->amigoPerf_remoji, $this->amigoPerf_remoji_val );
             
-            $this->amigoPerf_defer_val = (isset($_POST[$this->amigoPerf_defer]) ? $_POST[$this->amigoPerf_defer] : "off");
+            $this->amigoPerf_defer_val = (isset($_POST[$this->amigoPerf_defer]) ? $_POST[$this->amigoPerf_defer] : FALSE);
             update_option( $this->amigoPerf_defer, $this->amigoPerf_defer_val );
             
-            $this->amigoPerf_iframelazy_val = (isset($_POST[$this->amigoPerf_iframelazy]) ? $_POST[$this->amigoPerf_iframelazy] : "off");
+            $this->amigoPerf_iframelazy_val = (isset($_POST[$this->amigoPerf_iframelazy]) ? $_POST[$this->amigoPerf_iframelazy] : FALSE);
             update_option( $this->amigoPerf_iframelazy, $this->amigoPerf_iframelazy_val );
 
             flush_rewrite_rules();
@@ -161,14 +161,14 @@ class AmigoPerformancePlugin{
     public function amigoPerf_iframelazy_operation()
     {
         //Inline Footer
-        function inline_footer(){ ?>
-            <!-- Allpage -->
+        function inline_footer(){ 
+            $lazyscript = '
             <script>
                 /* 
                 URL: https://github.com/AmigoDheena/amigolazy
                 Author: Amigo Dheena
                 */
-                let amframe = document.querySelectorAll('.amigolazy');
+                let amframe = document.querySelectorAll(".amigolazy");
                 window.onload = function(){
                     for(let i=0; i<amframe.length;i++){
                         let amsrc = amframe[i];
@@ -183,9 +183,9 @@ class AmigoPerformancePlugin{
                         }, datanew);
                     }
                 }
-            </script>
-            <!-- Allpage -->
-        <?php }
+            </script>';
+            _e($lazyscript, 'amigo-performance');
+        }
         //Inline Footer
         add_action('wp_footer', 'inline_footer', 100);
     }
