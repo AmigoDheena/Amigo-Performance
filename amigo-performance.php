@@ -100,7 +100,7 @@ class AmigoPerformancePlugin{
         
     public function amigoperf_hiddenField(){
         if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] == 'Y') {
-            $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? $_POST[$this->amigoPerf_rqs] : (bool)FALSE);
+            $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? $_POST[$this->amigoPerf_rqs] : FALSE);
             update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
 
             $this->amigoPerf_remoji_val = (isset($_POST[$this->amigoPerf_remoji]) ? $_POST[$this->amigoPerf_remoji] : FALSE);
