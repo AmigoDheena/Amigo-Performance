@@ -209,7 +209,6 @@ class AmigoPerformancePlugin{
                 add_action('get_header', array($this,'link_rel_buffer_start'));
                 add_action('wp_footer', array($this,'link_rel_buffer_end'));
             }
-
         }
     }
     
