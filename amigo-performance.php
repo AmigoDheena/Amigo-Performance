@@ -35,17 +35,11 @@ class AmigoPerformancePlugin{
     public $amigoPerf_remoji;
     public $amigoPerf_defer;
     public $amigoPerf_iframelazy;
-
-    function __construct()
-    {
-        
-    }
     
     function amigoperformance_activate()
     {
         update_option( $this->amigoPerf_update_checker, AMIGOPERF_PLUGIN_VERSION );
         return AMIGOPERF_PLUGIN_VERSION;
-
     }
 
     function amigoperformance_deactivate()
@@ -61,7 +55,7 @@ class AmigoPerformancePlugin{
         }
     }
 
-    function my_plugin_is_current_version(){
+    function amigoPerf_is_current_version(){
         return version_compare($this->version, AMIGOPERF_PLUGIN_VERSION, '=') ? true : false;
     }
 
@@ -233,8 +227,6 @@ class AmigoPerformancePlugin{
 
     public function amigoPerf_newpage(){
         require_once plugin_dir_path(__FILE__).'admin.php';
-        // require 'admin.php';
-        // echo $this->amigoPerf_PluginName;
     }
 
     function amigoPerf_reg_menu(){
