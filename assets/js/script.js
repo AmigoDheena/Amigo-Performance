@@ -1,1 +1,0 @@
-// Amigo Performance Main JS
