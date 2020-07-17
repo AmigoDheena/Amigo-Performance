@@ -68,7 +68,7 @@ class AmigoPerformancePlugin{
     // Enqueue Style sheets and Scripts
     function amigoperformance_enqueue_style(){
         wp_enqueue_style('amigoperf_style', plugins_url('assets/css/style.css',__FILE__));
-        wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__));
+        // wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__));
     }
 
     // Register Style sheets and Scripts
