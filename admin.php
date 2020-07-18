@@ -14,7 +14,7 @@
     </div>
 
     <form method="post" id="formid">
-        <input type="hidden" name="<?php esc_html_e($this->amigoPerf_hfn,'amigo-peformance'); ?>" value="Y">
+        <input type="hidden" name="<?php esc_html_e($this->amigoPerf_hfn,'amigo-peformance'); ?>" value="<?php esc_html_e('Y','amigo-performance'); ?>">
 
         <label class="amigoPerf_lable"><?php esc_html_e('Remove Query String','amigo-performance'); ?>
             <input type="checkbox" class="custom-control-input" name="<?php esc_html_e($this->amigoPerf_rqs,'amigo-peformance'); ?>" value="<?php  esc_html_e($this->amigoPerf_rqs_opt,'amigo-peformance'); ?>" <?php checked($this->amigoPerf_rqs_opt == get_option($this->amigoPerf_rqs),true);?>  >
