@@ -62,7 +62,6 @@ class AmigoPerformancePlugin{
     // Enqueue Style sheets and Scripts
     function amigoperformance_enqueue_style(){
         wp_enqueue_style('amigoperf_style', plugins_url('assets/css/style.css',__FILE__));
-        // wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__));
     }
 
     // Register Style sheets and Scripts
@@ -93,7 +92,7 @@ class AmigoPerformancePlugin{
     }
         
     public function amigoperf_hiddenField(){
-        if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] == 'Y') {
+        if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] === 'Y') {
             $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? $_POST[$this->amigoPerf_rqs] : FALSE);
             update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
 
