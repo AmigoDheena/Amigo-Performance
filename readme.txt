@@ -68,7 +68,9 @@ You can check in an popular services like GTmetrix and Google Page Speed Insight
 1. Admin Setting Page
 
 == Changelog ==
-
+= 0.1 =
+* Initial release.
 
 == Upgrade Notice ==
-
+= 0.1 =
+* Initial release.
