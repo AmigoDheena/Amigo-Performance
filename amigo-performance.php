@@ -93,6 +93,7 @@ class AmigoPerformancePlugin{
         
     public function amigoperf_hiddenField(){
         if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] === 'Y') {
+
             $this->amigoPerf_rqs_val = ( FALSE!== isset($_POST[$this->amigoPerf_rqs]) ? FALSE!== $_POST[$this->amigoPerf_rqs] : FALSE);
             if (is_bool($this->amigoPerf_rqs_val)) {
                 update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
@@ -127,11 +128,11 @@ class AmigoPerformancePlugin{
     public function amigoPerf_rqs_operation()
     {
         if($this->amigoPerf_rqs_opt == get_option($this->amigoPerf_rqs)) {
-            if(!is_admin()) {                   
+            if(!is_admin()) {
                 add_filter( 'style_loader_src', array($this,'amigoPerf_rqs_query'), 10, 2 );
                 add_filter( 'script_loader_src', array($this,'amigoPerf_rqs_query'), 10, 2 );
             }
-        }            
+        }
     }
 
     public function amigoPerf_remoji_operation()
