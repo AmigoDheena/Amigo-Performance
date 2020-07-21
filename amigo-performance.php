@@ -93,17 +93,25 @@ class AmigoPerformancePlugin{
         
     public function amigoperf_hiddenField(){
         if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] === 'Y') {
-            $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? $_POST[$this->amigoPerf_rqs] : FALSE);
-            update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
+            $this->amigoPerf_rqs_val = ( FALSE!== isset($_POST[$this->amigoPerf_rqs]) ? FALSE!== $_POST[$this->amigoPerf_rqs] : FALSE);
+            if (is_bool($this->amigoPerf_rqs_val)) {
+                update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
+            }
 
-            $this->amigoPerf_remoji_val = (isset($_POST[$this->amigoPerf_remoji]) ? $_POST[$this->amigoPerf_remoji] : FALSE);
-            update_option( $this->amigoPerf_remoji, $this->amigoPerf_remoji_val );
+            $this->amigoPerf_remoji_val = (FALSE!== isset($_POST[$this->amigoPerf_remoji]) ? FALSE!== $_POST[$this->amigoPerf_remoji] : FALSE);
+            if (is_bool($this->amigoPerf_remoji_val)) {
+                update_option( $this->amigoPerf_remoji, $this->amigoPerf_remoji_val );
+            }
             
-            $this->amigoPerf_defer_val = (isset($_POST[$this->amigoPerf_defer]) ? $_POST[$this->amigoPerf_defer] : FALSE);
-            update_option( $this->amigoPerf_defer, $this->amigoPerf_defer_val );
+            $this->amigoPerf_defer_val = (FALSE!== isset($_POST[$this->amigoPerf_defer]) ? FALSE!== $_POST[$this->amigoPerf_defer] : FALSE);
+            if (is_bool($this->amigoPerf_defer_val)) {
+                update_option( $this->amigoPerf_defer, $this->amigoPerf_defer_val );
+            }
             
-            $this->amigoPerf_iframelazy_val = (isset($_POST[$this->amigoPerf_iframelazy]) ? $_POST[$this->amigoPerf_iframelazy] : FALSE);
-            update_option( $this->amigoPerf_iframelazy, $this->amigoPerf_iframelazy_val );
+            $this->amigoPerf_iframelazy_val = (FALSE!== isset($_POST[$this->amigoPerf_iframelazy]) ? FALSE!== $_POST[$this->amigoPerf_iframelazy] : FALSE);
+            if (is_bool($this->amigoPerf_iframelazy_val)) {
+                update_option( $this->amigoPerf_iframelazy, $this->amigoPerf_iframelazy_val );
+            }
 
             flush_rewrite_rules();
         }
