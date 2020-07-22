@@ -1,7 +1,7 @@
 # [Amigo Performance](https://wordpress.org/plugins/amigo-performance/)
 Amigo Performance is a WordPress Plugin that is used to Optimize Website Performance and improve Site Score in services like Google Page Speed Insight, GTmetrix.
 
-[![License](https://img.shields.io/badge/license-GPL--2.0%2B-red.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
+![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/amigo-performance?style=for-the-badge)
 
 Very simple user interface to optimize selected option, Currently available optimization features are,
 
