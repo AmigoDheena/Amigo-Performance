@@ -1,7 +1,13 @@
 # [Amigo Performance](https://wordpress.org/plugins/amigo-performance/)
+![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/amigo-performance?style=for-the-badge)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/amigodheena/amigo-performance?style=for-the-badge)
+![WordPress Plugin: Tested WP Version](https://img.shields.io/wordpress/plugin/tested/amigo-performance?style=for-the-badge)
+![WordPress Plugin Downloads](https://img.shields.io/wordpress/plugin/dt/amigo-performance?style=for-the-badge)
+![WordPress Plugin Rating](https://img.shields.io/wordpress/plugin/stars/amigo-performance?style=for-the-badge)
+
 Amigo Performance is a WordPress Plugin that is used to Optimize Website Performance and improve Site Score in services like Google Page Speed Insight, GTmetrix.
 
-![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/amigo-performance?style=for-the-badge)
+
 
 Very simple user interface to optimize selected option, Currently available optimization features are,
 
