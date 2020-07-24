@@ -6,7 +6,7 @@
  
  * Plugin Name:       Amigo Performance
  * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
- * Description:       A WordPress Plugin to Optimize Website Performance and improve Site Score.
+ * Description:       Amigo Performance is used to Optimize Website Performance and improve Site Score in services like Google Page Speed Insight, GTmetrix.
  * Version:           0.1
  * Author:            Amigo Dheena
  * Author URI:        https://www.amigodheena.xyz
@@ -240,6 +240,42 @@ class AmigoPerformancePlugin{
         add_action('admin_menu', array($this, 'amigoperformance_add_pages'));
     }
 
+    // List of Enqueued files
+    public function amigoPerf_enqueue_list_scripts() {
+        global $wp_scripts;
+        global $enqueued_scripts;
+        $enqueued_scripts = array();
+        foreach( $wp_scripts->queue as $handle ) {
+            $enqueued_scripts[] = array_filter(array('handle' => $wp_scripts->registered[$handle]->handle , 'src'=> $wp_scripts->registered[$handle]->src));
+        }
+    }
+    
+    public function amigoPerf_enqueue_list_styles() {
+        global $wp_styles;
+        global $enqueued_styles;
+        $enqueued_styles = array();
+        foreach( $wp_styles->queue as $handle ) {
+            $enqueued_styles[] = array_filter(array('handle'=>$wp_styles->registered[$handle]->handle , 'src'=> $wp_styles->registered[$handle]->src));
+        }
+    }
+
+    public function amigoPerf_enqueued(){
+        global $enqueued_scripts;
+        global $enqueued_styles;
+        print_r($enqueued_scripts);
+        print_r($enqueued_styles );
+        update_option('amigoPerf_nq_script', $enqueued_scripts);
+        update_option('amigoPerf_nq_style', $enqueued_styles);
+    }
+    public function amigoPerf_enqueued_list(){
+        if (is_front_page()){
+            add_action( 'wp_print_scripts',  array($this, 'amigoPerf_enqueue_list_scripts') );
+            add_action( 'wp_print_styles',  array($this, 'amigoPerf_enqueue_list_styles') );
+            add_action( 'wp_head', array($this,'amigoPerf_enqueued') );
+        }
+    }
+    // List of Enqueued files
+
 }
 
 if (class_exists('AmigoPerformancePlugin')) {
@@ -256,6 +292,8 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoPerfDefault -> amigoPerf_iframelazy_execute(); //Iframe Lazyload  
     $amigoPerfDefault -> amigoPerf_reg_menu(); //Register Menu
     $amigoPerfDefault -> amigoPerf_update_checker(); //Update checker
+
+    $amigoPerfDefault -> amigoPerf_enqueued_list(); //List of Enqueued files
 }
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
