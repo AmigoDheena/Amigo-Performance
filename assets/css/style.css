@@ -100,7 +100,7 @@
 .amigoPerf_enqueued {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
-  /* width: 100%; */
+  width: 100%;
   margin-top: 20px;
 }
 
@@ -119,4 +119,11 @@
   text-align: left;
   background-color: #4CAF50;
   color: white;
+}
+
+.amigoPerf-row{
+  display: flex;
+}
+.amigoPerf-column{
+  width: 50%;
 }
