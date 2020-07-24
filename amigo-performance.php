@@ -45,6 +45,8 @@ class AmigoPerformancePlugin{
     function amigoperformance_deactivate()
     {
         flush_rewrite_rules();
+        delete_option('amigoPerf_nq_script');
+        delete_option('amigoPerf_nq_style');
     }
 
     // Check plugin versioin
@@ -268,11 +270,11 @@ class AmigoPerformancePlugin{
         update_option('amigoPerf_nq_style', $enqueued_styles);
     }
     public function amigoPerf_enqueued_list(){
-        if (is_front_page()){
+        // if (is_front_page()){
             add_action( 'wp_print_scripts',  array($this, 'amigoPerf_enqueue_list_scripts') );
             add_action( 'wp_print_styles',  array($this, 'amigoPerf_enqueue_list_styles') );
             add_action( 'wp_head', array($this,'amigoPerf_enqueued') );
-        }
+        // }
     }
     // List of Enqueued files
 
