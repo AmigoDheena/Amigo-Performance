@@ -96,3 +96,27 @@
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
+
+.amigoPerf_enqueued {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  /* width: 100%; */
+  margin-top: 20px;
+}
+
+.amigoPerf_enqueued td, .amigoPerf_enqueued th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.amigoPerf_enqueued tr:nth-child(even){background-color: #f2f2f2;}
+
+.amigoPerf_enqueued tr:hover {background-color: #ddd;}
+
+.amigoPerf_enqueued th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
