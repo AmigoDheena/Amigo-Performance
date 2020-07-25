@@ -35,6 +35,8 @@ class AmigoPerformancePlugin{
     public $amigoPerf_remoji;
     public $amigoPerf_defer;
     public $amigoPerf_iframelazy;
+
+    public $amigoPerf_ehfn = 'amigoPerf_ehfn';
     
     function amigoperformance_activate()
     {
@@ -117,6 +119,16 @@ class AmigoPerformancePlugin{
             }
 
             flush_rewrite_rules();
+        }
+    }
+
+    public function amigoPerf_enqueued_field(){
+        if (isset($_POST[$this->amigoPerf_ehfn]) && $_POST[$this->amigoPerf_ehfn] === 'E') {
+            // if (!empty($_POST[$this->amigoPerf_ehfn])) {
+                $this->amigoPerf_handle_value = esc_html_e($_POST['handle']);
+                $this->amigoPerf_handle = 'amigoPerf_handle';
+                update_option($this->amigoPerf_handle,$this->amigoPerf_handle_value);
+            // }
         }
     }
 

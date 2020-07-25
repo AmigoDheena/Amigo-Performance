@@ -37,35 +37,41 @@
         </label>
         
         <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" class="amperf-submitbtn" name="submit">
+    </form><br>
+
+    <form method="post" id="formid">
+        <textarea name="<?php esc_html_e('hadle','amigo-peformance') ?>" id="handle" cols="100" rows="10"></textarea><br>
+        <input type="submit" value="Save" name="submit" class="amperf-submitbtn">
     </form>
+
     <div class="amigoPerf-row">
         <div class="amigoPerf-column">
             <table class="amigoPerf_enqueued">
-                    <tr>
-                        <th>S.no</th>
-                        <th>Handle</th>
-                        <th>Src</th>
-                    </tr>
-                    <?php for ($i=0; $i <=count(get_option('amigoPerf_nq_script')); $i++) { 
-                        echo "<tr><td>$i</td>";
-                        echo '<td>'.get_option('amigoPerf_nq_script')[$i]['handle'].'</td>';
-                        echo '<td>'.get_option('amigoPerf_nq_script')[$i]['src'].'</td></tr>';                
-                    }?>
-            </table>
-        </div>
-
-        <div class="amigoPerf-column">
-        <table class="amigoPerf_enqueued">
                 <tr>
                     <th>S.no</th>
                     <th>Handle</th>
                     <th>Src</th>
                 </tr>
-                <?php for ($i=0; $i <=count(get_option('amigoPerf_nq_style')); $i++) { 
+                <?php for ($i=0; $i <=count(get_option('amigoPerf_nq_script')); $i++) { 
                     echo "<tr><td>$i</td>";
-                    echo '<td>'.get_option('amigoPerf_nq_style')[$i]['handle'].'</td>';
-                    echo '<td>'.get_option('amigoPerf_nq_style')[$i]['src'].'</td></tr>';                
+                    echo '<td>'.get_option('amigoPerf_nq_script')[$i]['handle'].'</td>';
+                    echo '<td>'.get_option('amigoPerf_nq_script')[$i]['src'].'</td></tr>';                
                 }?>
+            </table>
+        </div>
+
+        <div class="amigoPerf-column">
+        <table class="amigoPerf_enqueued">
+            <tr>
+                <th>S.no</th>
+                <th>Handle</th>
+                <th>Src</th>
+            </tr>
+            <?php for ($i=0; $i <=count(get_option('amigoPerf_nq_style')); $i++) { 
+                echo "<tr><td>$i</td>";
+                echo '<td>'.get_option('amigoPerf_nq_style')[$i]['handle'].'</td>';
+                echo '<td>'.get_option('amigoPerf_nq_style')[$i]['src'].'</td></tr>';                
+            }?>
         </table>
         </div>
     </div>
