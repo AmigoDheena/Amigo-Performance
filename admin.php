@@ -39,10 +39,22 @@
         <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" class="amperf-submitbtn" name="submit">
     </form><br>
 
-    <form method="post" id="formid">
-        <textarea name="<?php esc_html_e('hadle','amigo-peformance') ?>" id="handle" cols="100" rows="10"></textarea><br>
-        <input type="submit" value="Save" name="submit" class="amperf-submitbtn">
-    </form>
+    <div class="amigoPerf-row">
+        <div class="amigoPerf-column">
+            <form method="post" id="formid">
+            <p>Enqueued JS Handle:</p>
+                <textarea name="<?php esc_html_e('js_hadle','amigo-peformance') ?>" id="js_handle" cols="100" rows="10"><?php echo get_option('amigoPerf_save_nq_script'); ?></textarea><br>
+                <input type="submit" value="Save" name="enqueued_js_submit" class="amperf-submitbtn">
+            </form>
+        </div>
+        <div class="amigoPerf-column">
+            <form method="post" id="formid">
+            <p>Enqueued CSS Handle:</p>
+                <textarea name="<?php esc_html_e('css_hadle','amigo-peformance') ?>" id="css_handle" cols="100" rows="10"><?php echo get_option('amigoPerf_save_nq_style'); ?></textarea><br>
+                <input type="submit" value="Save" name="enqueued_css_submit" class="amperf-submitbtn">
+            </form>
+        </div>
+    </div>
 
     <div class="amigoPerf-row">
         <div class="amigoPerf-column">
