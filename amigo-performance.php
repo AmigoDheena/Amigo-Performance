@@ -36,8 +36,6 @@ class AmigoPerformancePlugin{
     public $amigoPerf_defer;
     public $amigoPerf_iframelazy;
 
-    public $amigoPerf_ehfn = 'amigoPerf_ehfn';
-    
     function amigoperformance_activate()
     {
         update_option( $this->amigoPerf_update_checker, AMIGOPERF_PLUGIN_VERSION );
@@ -119,16 +117,6 @@ class AmigoPerformancePlugin{
             }
 
             flush_rewrite_rules();
-        }
-    }
-
-    public function amigoPerf_enqueued_field(){
-        if (isset($_POST[$this->amigoPerf_ehfn]) && $_POST[$this->amigoPerf_ehfn] === 'E') {
-            // if (!empty($_POST[$this->amigoPerf_ehfn])) {
-                $this->amigoPerf_handle_value = esc_html_e($_POST['handle']);
-                $this->amigoPerf_handle = 'amigoPerf_handle';
-                update_option($this->amigoPerf_handle,$this->amigoPerf_handle_value);
-            // }
         }
     }
 
@@ -217,7 +205,7 @@ class AmigoPerformancePlugin{
 
     public function link_rel_buffer_end() {
         ob_flush();
-    } 
+    }
 
     public function amigoPerf_iframelazy_execute(){
         if($this->amigoPerf_iframelazy_opt == get_option($this->amigoPerf_iframelazy)) {
@@ -278,15 +266,26 @@ class AmigoPerformancePlugin{
         global $enqueued_styles;
         print_r($enqueued_scripts);
         print_r($enqueued_styles );
-        update_option('amigoPerf_nq_script', $enqueued_scripts);
         update_option('amigoPerf_nq_style', $enqueued_styles);
+        update_option('amigoPerf_nq_script', $enqueued_scripts);
     }
     public function amigoPerf_enqueued_list(){
-        // if (is_front_page()){
-            add_action( 'wp_print_scripts',  array($this, 'amigoPerf_enqueue_list_scripts') );
-            add_action( 'wp_print_styles',  array($this, 'amigoPerf_enqueue_list_styles') );
-            add_action( 'wp_head', array($this,'amigoPerf_enqueued') );
-        // }
+        add_action( 'wp_print_scripts',  array($this, 'amigoPerf_enqueue_list_scripts') );
+        add_action( 'wp_print_styles',  array($this, 'amigoPerf_enqueue_list_styles') );
+        add_action( 'wp_head', array($this,'amigoPerf_enqueued') );
+    }
+
+    public function save_enqueued_css(){
+        $this->css_handle = $_POST['css_hadle'];
+        if (isset($_POST['enqueued_css_submit'])) {
+            update_option('amigoPerf_save_nq_style', $this->css_handle);
+        }
+    }
+    public function save_enqueued_js(){
+        $this->js_handle = $_POST['js_hadle'];
+        if (isset($_POST['enqueued_js_submit'])) {
+            update_option('amigoPerf_save_nq_script', $this->js_handle);
+        }
     }
     // List of Enqueued files
 
@@ -308,6 +307,8 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoPerfDefault -> amigoPerf_update_checker(); //Update checker
 
     $amigoPerfDefault -> amigoPerf_enqueued_list(); //List of Enqueued files
+    $amigoPerfDefault -> save_enqueued_css(); //Save Enqueued CSS files
+    $amigoPerfDefault -> save_enqueued_js(); //Save Enqueued JS files
 }
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
