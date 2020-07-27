@@ -59,27 +59,38 @@
     <div class="amigoPerf-row">
         <div class="amigoPerf-column">
             <?php if (!empty(get_option('amigoPerf_nq_script'))):?>
-                <table class="amigoPerf_enqueued">
-                    <tr>
-                        <th>S.no</th>
-                        <th>Handle</th>
-                        <th>Src</th>
-                    </tr>
-                    <?php 
-                        $amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
-                        array_unshift($amigoPerf_nqjs_array,"");
-                        unset($amigoPerf_nqjs_array[0]);
-                        // echo "<pre>";
-                        // print_r($amigoPerf_nqjs_array);
-                        // echo "</pre>";
-                        for ($i=1; $i <=count($amigoPerf_nqjs_array); $i++) {
-                            echo "<tr><td><input type='checkbox' name='nq_js[]' value='$i'></td>";
-                            echo '<td>'.$amigoPerf_nqjs_array[$i]['handle'].'</td>';
-                            echo '<td>'.$amigoPerf_nqjs_array[$i]['src'].'</td></tr>';                
-                        }
-                    ?>
-                </table>
-            <?php endif; ?>
+                <form method="post">
+                    <table class="amigoPerf_enqueued">
+                        <tr>
+                            <th>S.no</th>
+                            <th>Handle</th>
+                            <th>Src</th>
+                        </tr>
+                        <?php 
+                            $amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
+                            array_unshift($amigoPerf_nqjs_array,"");
+                            unset($amigoPerf_nqjs_array[0]);
+                            // echo "<pre>";
+                            // print_r($amigoPerf_nqjs_array);
+                            // echo "</pre>";
+                            for ($i=1; $i <=count($amigoPerf_nqjs_array); $i++) {
+                                echo "<tr><td><input type='checkbox' name='nq_js[]' value='$i'></td>";
+                                echo '<td>'.$amigoPerf_nqjs_array[$i]['handle'].'</td>';
+                                echo '<td>'.$amigoPerf_nqjs_array[$i]['src'].'</td></tr>';                                                
+                            }
+                        ?>
+                    </table>
+                    <input type="submit" value="Submit" name="nq_js_submit">
+                </form>
+            <?php endif; 
+                if (isset($_POST['nq_js_submit'])) {
+                    $post_nq_js = $_POST['nq_js'];
+                    for ($i=0; $i <count($post_nq_js) ; $i++) { 
+                        // print_r($post_nq_js[$i]) ;
+                        print_r(get_option('amigoPerf_nq_script')[$i]['handle']);
+                    }
+                }
+            ?>
         </div>
 
         <div class="amigoPerf-column">
