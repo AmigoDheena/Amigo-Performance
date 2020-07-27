@@ -39,52 +39,71 @@
         <input type="submit" value="<?php esc_attr_e('Save Changes','Amigo-Performance') ?>" class="amperf-submitbtn" name="submit">
     </form><br>
 
-    <div class="amigoPerf-row">
+    <!-- <div class="amigoPerf-row">
         <div class="amigoPerf-column">
             <form method="post" id="formid">
             <p>Enqueued JS Handle:</p>
-                <textarea name="<?php esc_html_e('js_hadle','amigo-peformance') ?>" id="js_handle" cols="100" rows="10"><?php echo get_option('amigoPerf_save_nq_script'); ?></textarea><br>
+                <textarea name="<?php //esc_html_e('js_hadle','amigo-peformance') ?>" id="js_handle" cols="100" rows="10"><?php //echo get_option('amigoPerf_save_nq_script'); ?></textarea><br>
                 <input type="submit" value="Save" name="enqueued_js_submit" class="amperf-submitbtn">
             </form>
         </div>
         <div class="amigoPerf-column">
             <form method="post" id="formid">
             <p>Enqueued CSS Handle:</p>
-                <textarea name="<?php esc_html_e('css_hadle','amigo-peformance') ?>" id="css_handle" cols="100" rows="10"><?php echo get_option('amigoPerf_save_nq_style'); ?></textarea><br>
+                <textarea name="<?php //esc_html_e('css_hadle','amigo-peformance') ?>" id="css_handle" cols="100" rows="10"><?php //echo get_option('amigoPerf_save_nq_style'); ?></textarea><br>
                 <input type="submit" value="Save" name="enqueued_css_submit" class="amperf-submitbtn">
             </form>
         </div>
-    </div>
+    </div> -->
 
     <div class="amigoPerf-row">
         <div class="amigoPerf-column">
-            <table class="amigoPerf_enqueued">
-                <tr>
-                    <th>S.no</th>
-                    <th>Handle</th>
-                    <th>Src</th>
-                </tr>
-                <?php for ($i=0; $i <=count(get_option('amigoPerf_nq_script')); $i++) { 
-                    echo "<tr><td>$i</td>";
-                    echo '<td>'.get_option('amigoPerf_nq_script')[$i]['handle'].'</td>';
-                    echo '<td>'.get_option('amigoPerf_nq_script')[$i]['src'].'</td></tr>';                
-                }?>
-            </table>
+            <?php if (!empty(get_option('amigoPerf_nq_script'))):?>
+                <table class="amigoPerf_enqueued">
+                    <tr>
+                        <th>S.no</th>
+                        <th>Handle</th>
+                        <th>Src</th>
+                    </tr>
+                    <?php 
+                        $amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
+                        array_unshift($amigoPerf_nqjs_array,"");
+                        unset($amigoPerf_nqjs_array[0]);
+                        // echo "<pre>";
+                        // print_r($amigoPerf_nqjs_array);
+                        // echo "</pre>";
+                        for ($i=1; $i <=count($amigoPerf_nqjs_array); $i++) {
+                            echo "<tr><td><input type='checkbox' name='nq_js[]' value='$i'></td>";
+                            echo '<td>'.$amigoPerf_nqjs_array[$i]['handle'].'</td>';
+                            echo '<td>'.$amigoPerf_nqjs_array[$i]['src'].'</td></tr>';                
+                        }
+                    ?>
+                </table>
+            <?php endif; ?>
         </div>
 
         <div class="amigoPerf-column">
-        <table class="amigoPerf_enqueued">
-            <tr>
-                <th>S.no</th>
-                <th>Handle</th>
-                <th>Src</th>
-            </tr>
-            <?php for ($i=0; $i <=count(get_option('amigoPerf_nq_style')); $i++) { 
-                echo "<tr><td>$i</td>";
-                echo '<td>'.get_option('amigoPerf_nq_style')[$i]['handle'].'</td>';
-                echo '<td>'.get_option('amigoPerf_nq_style')[$i]['src'].'</td></tr>';                
-            }?>
-        </table>
+            <?php if (!empty(get_option('amigoPerf_nq_style'))):?>
+                <table class="amigoPerf_enqueued">
+                    <tr>
+                        <th>S.no</th>
+                        <th>Handle</th>
+                        <th>Src</th>
+                    </tr>
+                    <?php 
+                    $amigoPerf_nqcss_array = get_option('amigoPerf_nq_style');
+                    array_unshift($amigoPerf_nqcss_array,"");
+                    unset($amigoPerf_nqcss_array[0]);
+                    // echo "<pre>";
+                    // print_r($amigoPerf_nqcss_array);
+                    // echo "</pre>";
+                    for ($i=1; $i <=count($amigoPerf_nqcss_array); $i++) { 
+                        echo "<tr><td><input type='checkbox' name='nq_js[]' value='$i'></td>";
+                        echo '<td>'.$amigoPerf_nqcss_array[$i]['handle'].'</td>';
+                        echo '<td>'.$amigoPerf_nqcss_array[$i]['src'].'</td></tr>';                
+                    }?>
+                </table>
+            <?php endif; ?>
         </div>
     </div>
 </div>
