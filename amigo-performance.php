@@ -306,7 +306,28 @@ class AmigoPerformancePlugin{
     }
     public function amigoPerf_dequeue(){
         add_action('wp_print_scripts', array($this, 'amigoPerf_dq_js'), 100);
-    }    
+    }  
+    
+    function amigoPerf_admin_bar ( WP_Admin_Bar $admin_bar ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $admin_bar->add_menu( array(
+            'id'    => 'menu-id',
+            'parent' => null,
+            'group'  => null,
+            'title' => 'AmigoPerf', //you can use img tag with image link. it will show the image icon Instead of the title.
+            'href'  => admin_url('admin.php?page=amigo_performance'),
+            'meta' => [
+                'title' => __( 'Amigo Performance', 'amigo-performance' ), //This title will show on hover
+            ]
+        ) );
+    }
+
+    public function amigoPerf_adminmenu(){
+        add_action( 'admin_bar_menu', array($this,'amigoPerf_admin_bar'), 500 );
+    }
+
     // Working in Progress
 
     // List of Enqueued files
@@ -333,6 +354,7 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoPerfDefault -> save_enqueued_js(); //Save Enqueued JS files
 
     //$amigoPerfDefault -> amigoPerf_dequeue(); //DQ js WIP
+    $amigoPerfDefault -> amigoPerf_adminmenu(); //DQ js WIP
 }
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
