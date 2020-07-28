@@ -68,12 +68,9 @@
                         </tr>
                         <?php 
                             $amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
-                            array_unshift($amigoPerf_nqjs_array,"");
-                            unset($amigoPerf_nqjs_array[0]);
-                            // echo "<pre>";
-                            // print_r($amigoPerf_nqjs_array);
-                            // echo "</pre>";
-                            for ($i=1; $i <=count($amigoPerf_nqjs_array); $i++) {
+                            // array_unshift($amigoPerf_nqjs_array,"");
+                            // unset($amigoPerf_nqjs_array[0]);
+                            for ($i=0; $i <=count($amigoPerf_nqjs_array); $i++) {
                                 echo "<tr><td><input type='checkbox' name='nq_js[]' value='$i'></td>";
                                 echo '<td>'.$amigoPerf_nqjs_array[$i]['handle'].'</td>';
                                 echo '<td>'.$amigoPerf_nqjs_array[$i]['src'].'</td></tr>';                                                
@@ -87,8 +84,23 @@
                     $post_nq_js = $_POST['nq_js'];
                     for ($i=0; $i <count($post_nq_js) ; $i++) { 
                         // print_r($post_nq_js[$i]) ;
-                        print_r(get_option('amigoPerf_nq_script')[$i]['handle']);
+                        $amigoPerf_dq_script[] = get_option('amigoPerf_nq_script')[$post_nq_js[$i]];
+                        
+                        // update_option('amigoPerf_dq_script',array($amigoPerf_dq_script));
                     }
+                    echo "<pre>";
+                        print_r($amigoPerf_dq_script);
+                    echo "</pre>";
+                    update_option('amigoPerf_dq_script',array($amigoPerf_dq_script));
+                    
+                    $ardiff = array_diff_assoc($amigoPerf_nqjs_array,$amigoPerf_dq_script);
+                    print_r($ardiff);
+                    echo count($ardiff);
+                    if (!empty($ardiff)) {
+                        echo "Has Value";
+                    }else{
+                        echo "No Value";
+                    }                    
                 }
             ?>
         </div>
