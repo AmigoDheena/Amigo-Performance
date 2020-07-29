@@ -66,42 +66,25 @@
                             <th>Handle</th>
                             <th>Src</th>
                         </tr>
-                        <?php 
-                            $amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
-                            // array_unshift($amigoPerf_nqjs_array,"");
-                            // unset($amigoPerf_nqjs_array[0]);
-                            for ($i=0; $i <=count($amigoPerf_nqjs_array); $i++) {
-                                echo "<tr><td><input type='checkbox' name='nq_js[]' value='$i'></td>";
-                                echo '<td>'.$amigoPerf_nqjs_array[$i]['handle'].'</td>';
-                                echo '<td>'.$amigoPerf_nqjs_array[$i]['src'].'</td></tr>';                                                
+                        <?php
+                            for ($i=0; $i <=count($this->amigoPerf_nqjs_array); $i++) { 
+                                // echo "<tr><td><input type='checkbox' name='nq_js[]' value='$i'></td>";?>
+                        <tr><td><input type='checkbox' name='nq_js[]' value='<?php echo $i; ?>' <?php echo $this->checked; ?>></td>
+                               <?php
+                                echo '<td>'.$this->amigoPerf_nqjs_array[$i]['handle'].'</td>';
+                                echo '<td>'.$this->amigoPerf_nqjs_array[$i]['src'].'</td></tr>';                                                
                             }
                         ?>
                     </table>
                     <input type="submit" value="Submit" name="nq_js_submit">
                 </form>
             <?php endif; 
-                if (isset($_POST['nq_js_submit'])) {
-                    $post_nq_js = $_POST['nq_js'];
-                    for ($i=0; $i <count($post_nq_js) ; $i++) { 
-                        // print_r($post_nq_js[$i]) ;
-                        $amigoPerf_dq_script[] = get_option('amigoPerf_nq_script')[$post_nq_js[$i]];
-                        
-                        // update_option('amigoPerf_dq_script',array($amigoPerf_dq_script));
-                    }
-                    echo "<pre>";
-                        print_r($amigoPerf_dq_script);
-                    echo "</pre>";
-                    update_option('amigoPerf_dq_script',array($amigoPerf_dq_script));
-                    
-                    $ardiff = array_diff_assoc($amigoPerf_nqjs_array,$amigoPerf_dq_script);
-                    print_r($ardiff);
-                    echo count($ardiff);
-                    if (!empty($ardiff)) {
-                        echo "Has Value";
-                    }else{
-                        echo "No Value";
-                    }                    
-                }
+            echo "<pre>";
+            print_r($this->ar_val);
+            print_r($this->ar_val1);
+            // print_r(array_keys($this->ar_val,$this->ar_val1[1]));
+            // print_r($this->arsearch);
+            echo "</pre>";
             ?>
         </div>
 
