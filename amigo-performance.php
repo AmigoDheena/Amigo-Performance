@@ -328,6 +328,47 @@ class AmigoPerformancePlugin{
         add_action( 'admin_bar_menu', array($this,'amigoPerf_admin_bar'), 500 );
     }
 
+    public function amigoPerf_nq_js(){
+        $this->amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
+        // array_unshift($this->amigoPerf_nqjs_array,"");
+        // unset($this->amigoPerf_nqjs_array[0]);
+
+        if (isset($_POST['nq_js_submit'])) {
+            $this->post_nq_js = $_POST['nq_js'];
+            // $this->count = count($this->post_nq_js);
+            for ($i=0; $i <count($this->post_nq_js); $i++) { 
+                $this->amigoPerf_dq_script[] = get_option('amigoPerf_nq_script')[$this->post_nq_js[$i]];
+                $this->ar_val1 = array_column($this->amigoPerf_dq_script,'handle');
+
+                $this->ar_val = array_column($this->amigoPerf_nqjs_array,'handle');
+                $this->arsearch = array_search($this->ar_val1[$i],$this->ar_val);
+
+                
+
+                
+                // if (array_search($this->ar_val1[$i],$this->ar_val) == null) {
+                //     echo "Null";
+                // }else{
+                //     echo array_diff($this->ar_val,$this->ar_val1);
+                //     print_r($this->ar_val);
+                //     print_r($this->ar_val1);
+                //     if ($this->ar_val1 == $this->ar_val) {
+                //         $this->checked = "checked";
+                //         print_r($this->ar_val1[$i]);
+                //         echo "Checked";
+                //     }
+                // }
+            }
+            update_option('amigoPerf_dq_script',array($this->amigoPerf_dq_script));
+            $this->key_ar = [];
+            for ($j=0; $j <count($this->post_nq_js) ; $j++) { 
+                $this->key_ar = (array_keys($this->ar_val,$this->ar_val1[$j]));
+                print_r($this->key_ar);
+            }
+            
+        }
+    }
+
     // Working in Progress
 
     // List of Enqueued files
@@ -355,6 +396,7 @@ if (class_exists('AmigoPerformancePlugin')) {
 
     //$amigoPerfDefault -> amigoPerf_dequeue(); //DQ js WIP
     $amigoPerfDefault -> amigoPerf_adminmenu(); //DQ js WIP
+    $amigoPerfDefault -> amigoPerf_nq_js(); //DQ js WIP
 }
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
