@@ -284,13 +284,13 @@ class AmigoPerformancePlugin{
     }
 
     public function save_enqueued_css(){
-        $this->css_handle = $_POST['css_hadle'];
+        $this->css_handle = sanitize_textarea_field($_POST['css_hadle']);
         if (isset($_POST['enqueued_css_submit'])) {
             update_option('amigoPerf_save_nq_style', $this->css_handle);
         }
     }
     public function save_enqueued_js(){
-        $this->js_handle = $_POST['js_hadle'];
+        $this->js_handle = sanitize_textarea_field($_POST['js_hadle']);
         if (isset($_POST['enqueued_js_submit'])) {
             update_option('amigoPerf_save_nq_script', $this->js_handle);
         }
@@ -298,7 +298,6 @@ class AmigoPerformancePlugin{
 
     // Working in Progress
     public function amigoPerf_dq_js(){
-
         $this->amigoPerf_get_nq_js = get_option('amigoPerf_save_nq_script');
         $this->amigoPerf_dq_js_str_to_arr = explode (",", $this->amigoPerf_get_nq_js);
 
@@ -346,22 +345,8 @@ class AmigoPerformancePlugin{
         add_action( 'admin_bar_menu', array($this,'amigoPerf_admin_bar'), 500 );
     }
 
-    public function amigoPerf_nq_js(){
-        
+    public function amigoPerf_nq_js(){        
         $this->amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
-        // array_unshift($this->amigoPerf_nqjs_array,"");
-        // unset($this->amigoPerf_nqjs_array[0]);
-
-        // if (isset($_POST['nq_js_submit'])) {
-        //     $this->post_nq_js = $_POST['nq_js'];
-        //     for ($i=1; $i <count($this->post_nq_js); $i++) { 
-        //         $this->amigoPerf_dq_script[] = get_option('amigoPerf_nq_script')[$this->post_nq_js[$i]];
-        //         $this->ar_val1 = array_column($this->amigoPerf_dq_script,'handle');
-
-        //         $this->ar_val = array_column($this->amigoPerf_nqjs_array,'handle');
-        //         $this->arsearch = array_search($this->ar_val1[$i],$this->ar_val);
-        //     }
-        // }
         update_option('amigoPerf_dq_script',array($this->amigoPerf_dq_script));            
     }
 
@@ -401,8 +386,8 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoPerfDefault -> amigoPerf_nq_css(); //Enqueue CSS
 
     $amigoPerfDefault -> amigoPerf_adminmenu(); //DQ js WIP
-    $amigoPerfDefault -> amigoPerf_dequeue(); //DQ js WIP
-    $amigoPerfDefault -> amigoPerf_dq_js(); //DQ js WIP
+    $amigoPerfDefault -> amigoPerf_dequeue(); //DQ js and CSS - in Front page
+    // $amigoPerfDefault -> amigoPerf_dq_js(); //DQ js WIP
 }
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));

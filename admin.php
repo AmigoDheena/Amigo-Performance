@@ -42,14 +42,16 @@
     <div class="amigoPerf-row">
         <div class="amigoPerf-column">
             <form method="post" id="formid">
-            <p>Enqueued JS Handle:</p>
+            <p><?php esc_html_e('Remove JS','amigo-peformance') ?></p>
+            <p><?php esc_html_e('Enter your JS handle which you want to remove form Front Page','amigo-peformance') ?></p>
                 <textarea name="<?php esc_html_e('js_hadle','amigo-peformance') ?>" id="js_handle" cols="100" rows="10"><?php echo get_option('amigoPerf_save_nq_script'); ?></textarea><br>
                 <input type="submit" value="Save" name="enqueued_js_submit" class="amperf-submitbtn">
             </form>
         </div>
         <div class="amigoPerf-column">
             <form method="post" id="formid">
-            <p>Enqueued CSS Handle:</p>
+            <p><?php esc_html_e('Remove CSS','amigo-peformance') ?></p>
+            <p><?php esc_html_e('Enter your CSS handle which you want to remove form Front Page','amigo-peformance') ?></p>
                 <textarea name="<?php esc_html_e('css_hadle','amigo-peformance') ?>" id="css_handle" cols="100" rows="10"><?php echo get_option('amigoPerf_save_nq_style'); ?></textarea><br>
                 <input type="submit" value="Save" name="enqueued_css_submit" class="amperf-submitbtn">
             </form>
@@ -66,7 +68,7 @@
                         <th><?php esc_html_e('Src','amigo-peformance') ?></th>
                     </tr>
                     <?php
-                        for ($i=0; $i <=count($this->amigoPerf_nqjs_array); $i++) { 
+                        for ($i=0; $i <=count($this->amigoPerf_nqjs_array); $i++) {
                             echo '<tr><td>'.$i.'</td>';
                             echo '<td>'.$this->amigoPerf_nqjs_array[$i]['handle'].'</td>';
                             echo '<td>'.$this->amigoPerf_nqjs_array[$i]['src'].'</td></tr>';
@@ -94,6 +96,5 @@
                 </table>
             <?php endif; ?>
         </div>
-
     </div>
 </div>
