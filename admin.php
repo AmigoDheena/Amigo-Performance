@@ -68,14 +68,16 @@
                         <th><?php esc_html_e('Src','amigo-peformance') ?></th>
                     </tr>
                     <?php
-                        for ($i=0; $i <=count($this->amigoPerf_nqjs_array); $i++) {
+                    array_unshift($this->amigoPerf_nqjs_array,"");
+                    unset($this->amigoPerf_nqjs_array[0]);
+                        for ($i=1; $i <=count($this->amigoPerf_nqjs_array); $i++) {
                             echo '<tr><td>'.$i.'</td>';
                             echo '<td>'.$this->amigoPerf_nqjs_array[$i]['handle'].'</td>';
                             echo '<td>'.$this->amigoPerf_nqjs_array[$i]['src'].'</td></tr>';
                         }
                     ?>
                 </table>
-            <?php endif; ?>
+                <?php else:echo"Refresh front page to see results.!"; endif; ?>
         </div>
 
         <div class="amigoPerf-column">
@@ -87,14 +89,16 @@
                         <th><?php esc_html_e('Src','amigo-peformance') ?></th>
                     </tr>
                     <?php
-                        for ($i=0; $i <=count($this->amigoPerf_nqcss_array); $i++) { 
+                    array_unshift($this->amigoPerf_nqcss_array,"");
+                    unset($this->amigoPerf_nqcss_array[0]);
+                        for ($i=1; $i <=count($this->amigoPerf_nqcss_array); $i++) { 
                             echo '<tr><td>'.$i.'</td>';
                             echo '<td>'.$this->amigoPerf_nqcss_array[$i]['handle'].'</td>';
                             echo '<td>'.$this->amigoPerf_nqcss_array[$i]['src'].'</td></tr>';
                         }
                     ?>
                 </table>
-            <?php endif; ?>
+                <?php else:echo"Refresh front page to see results.!"; endif; ?>
         </div>
     </div>
 </div>
