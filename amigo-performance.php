@@ -166,7 +166,7 @@ class AmigoPerformancePlugin{
     {
         //Inline Footer
         function inline_footer(){ 
-            if (is_front_page()) {
+            // if (is_front_page()) {
                 $lazyscript = '
                 <script>
                     /* 
@@ -190,7 +190,7 @@ class AmigoPerformancePlugin{
                     }
                 </script>';
                 _e($lazyscript, 'amigo-performance');
-            }
+            // }
         }
         //Inline Footer
         add_action('wp_footer', 'inline_footer', 100);
@@ -296,7 +296,6 @@ class AmigoPerformancePlugin{
         }
     }
 
-    // Working in Progress
     public function amigoPerf_dq_js(){
         $this->amigoPerf_get_nq_js = get_option('amigoPerf_save_nq_script');
         $this->amigoPerf_dq_js_str_to_arr = explode (",", $this->amigoPerf_get_nq_js);
@@ -325,6 +324,18 @@ class AmigoPerformancePlugin{
         add_action( 'wp_print_styles', array($this, 'amigoPerf_dq_css'), 100);
     }
     
+    public function amigoPerf_nq_js(){        
+        $this->amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
+        update_option('amigoPerf_dq_script',array($this->amigoPerf_dq_script));            
+    }
+
+    public function amigoPerf_nq_css(){
+        $this->amigoPerf_nqcss_array = get_option('amigoPerf_nq_style');
+        update_option('amigoPerf_dq_style',array($this->amigoPerf_dq_style));            
+    }
+    // List of Enqueued files
+
+    // Working in Progress
     function amigoPerf_admin_bar ( WP_Admin_Bar $admin_bar ) {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
@@ -333,7 +344,7 @@ class AmigoPerformancePlugin{
             'id'    => 'menu-id',
             'parent' => null,
             'group'  => null,
-            'title' => 'AmigoPerf', //you can use img tag with image link. it will show the image icon Instead of the title.
+            'title' => '<span class="ab-icon dashicons dashicons-buddicons-activity"></span>' . _( 'AmigoPerf' ), //you can use img tag with image link. it will show the image icon Instead of the title.
             'href'  => admin_url('admin.php?page=amigo_performance'),
             'meta' => [
                 'title' => __( 'Amigo Performance', 'amigo-performance' ), //This title will show on hover
@@ -344,22 +355,7 @@ class AmigoPerformancePlugin{
     public function amigoPerf_adminmenu(){
         add_action( 'admin_bar_menu', array($this,'amigoPerf_admin_bar'), 500 );
     }
-
-    public function amigoPerf_nq_js(){        
-        $this->amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
-        update_option('amigoPerf_dq_script',array($this->amigoPerf_dq_script));            
-    }
-
-    public function amigoPerf_nq_css(){
-        $this->amigoPerf_nqcss_array = get_option('amigoPerf_nq_style');
-        // array_unshift($this->amigoPerf_nqcss_array,"");
-        // unset($this->amigoPerf_nqcss_array[0]);
-        update_option('amigoPerf_dq_style',array($this->amigoPerf_dq_style));            
-    }
-
     // Working in Progress
-
-    // List of Enqueued files
     
 }
 
@@ -385,9 +381,8 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoPerfDefault -> amigoPerf_nq_js(); //Enqueue JS
     $amigoPerfDefault -> amigoPerf_nq_css(); //Enqueue CSS
 
-    $amigoPerfDefault -> amigoPerf_adminmenu(); //DQ js WIP
     $amigoPerfDefault -> amigoPerf_dequeue(); //DQ js and CSS - in Front page
-    // $amigoPerfDefault -> amigoPerf_dq_js(); //DQ js WIP
+    // $amigoPerfDefault -> amigoPerf_adminmenu(); //Admin Bar menu WIP
 }
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));

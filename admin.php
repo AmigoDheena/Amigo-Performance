@@ -77,7 +77,7 @@
                         }
                     ?>
                 </table>
-                <?php else:echo"Refresh front page to see results.!"; endif; ?>
+                <?php else: esc_html_e('Refresh front page to see results.!','amigo-peformance'); endif; ?>
         </div>
 
         <div class="amigoPerf-column">
@@ -91,14 +91,14 @@
                     <?php
                     array_unshift($this->amigoPerf_nqcss_array,"");
                     unset($this->amigoPerf_nqcss_array[0]);
-                        for ($i=1; $i <=count($this->amigoPerf_nqcss_array); $i++) { 
+                        for ($i=1; $i <=count($this->amigoPerf_nqcss_array); $i++) {
                             echo '<tr><td>'.$i.'</td>';
                             echo '<td>'.$this->amigoPerf_nqcss_array[$i]['handle'].'</td>';
                             echo '<td>'.$this->amigoPerf_nqcss_array[$i]['src'].'</td></tr>';
                         }
                     ?>
                 </table>
-                <?php else:echo"Refresh front page to see results.!"; endif; ?>
+                <?php else: esc_html_e('Refresh front page to see results.!','amigo-peformance'); endif; ?>
         </div>
     </div>
 </div>
