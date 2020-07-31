@@ -7,7 +7,7 @@
  * Plugin Name:       Amigo Performance
  * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
  * Description:       Amigo Performance is used to Optimize Website Performance and improve Site Score in services like Google Page Speed Insight, GTmetrix.
- * Version:           0.1
+ * Version:           1.0
  * Author:            Amigo Dheena
  * Author URI:        https://www.amigodheena.xyz
  * Text Domain:       amigo-performance
@@ -24,7 +24,7 @@ include_once ( ABSPATH . 'wp-admin/includes/plugin.php' ); // to is_plugin_activ
     
 // Define plugin version for future releases
 if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
-    define('AMIGOPERF_PLUGIN_VERSION', '0.1');
+    define('AMIGOPERF_PLUGIN_VERSION', '1.0');
 }
 
 class AmigoPerformancePlugin{
@@ -49,7 +49,7 @@ class AmigoPerformancePlugin{
         delete_option('amigoPerf_nq_style');
     }
 
-    // Check plugin versioin
+    // Check plugin version
     function amigoPerf_update_checker() {        
         $version = get_option( $this->amigoPerf_PluginVersion ); 
         if( version_compare($version, AMIGOPERF_PLUGIN_VERSION , '<')) {
