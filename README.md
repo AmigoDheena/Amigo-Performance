@@ -15,6 +15,8 @@ Very simple user interface to optimize selected option, Currently available opti
 - Remove Emoji
 - Defer Parsing of Javascript
 - Iframe lazyload
+- Dequeue JS
+- Dequeue CSS
 
 **1. Remove Query String**
 
