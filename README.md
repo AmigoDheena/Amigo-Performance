@@ -36,3 +36,6 @@ In order to load a page, the browser must parse the contents of all **Script** t
 **4. Iframe Lazyload**
 
 Mostly iFrames are load data from an external site, so its contain lot of resources form external sites, we are unable to control that resources but we can prevent by lazyloading iFrame.
+
+**5. Dequeue JS
+**6. Dequeue CSS
