@@ -39,5 +39,9 @@ Mostly iFrames are load data from an external site, so its contain lot of resour
 
 **5. Dequeue JS**
 
+In this option you can remove unwanterd JS file from *Front Page*
+
 
 **6. Dequeue CSS**
+
+In this option you can remove unwanterd CSS file from *Front Page*
