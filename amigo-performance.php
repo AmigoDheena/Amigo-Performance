@@ -49,7 +49,7 @@ class AmigoPerformancePlugin{
         delete_option('amigoPerf_nq_style');
     }
 
-    // Check plugin version
+    // Check plugin versioin
     function amigoPerf_update_checker() {        
         $version = get_option( $this->amigoPerf_PluginVersion ); 
         if( version_compare($version, AMIGOPERF_PLUGIN_VERSION , '<')) {
@@ -66,9 +66,14 @@ class AmigoPerformancePlugin{
         wp_enqueue_style('amigoperf_style', plugins_url('assets/css/style.css',__FILE__));
     }
 
+    function amigoperformance_enqueue_script(){
+        wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__),array(), '1.0', true );
+    }
+
     // Register Style sheets and Scripts
     function amigoperformance_register(){
         add_action('admin_enqueue_scripts', array($this , 'amigoperformance_enqueue_style'));
+        add_action('admin_enqueue_scripts', array($this , 'amigoperformance_enqueue_script') );
     }
 
     public function amigoPerf_Default(){
