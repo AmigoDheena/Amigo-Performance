@@ -18,6 +18,10 @@ Very simple user interface to optimize selected option, Currently available opti
 - Dequeue JS
 - Dequeue CSS
 
+![Basics](/assets/screenshot-1.PNG "Basics")
+
+
+
 **1. Remove Query String**
 
 Your CSS and JavaScript files usually have the file version on the end of their URLs, such as **example.com/style.css?ver=4.6**. Some servers and proxy servers are unable to cache query strings, even if a **cache-control:public** header is present. By removing them, you can sometimes improve your caching.
@@ -40,8 +44,10 @@ Mostly iFrames are load data from an external site, so its contain lot of resour
 **5. Dequeue JS**
 
 In this option you can remove unwanterd JS file from *Front Page*
+![Dequeue JS](/assets/screenshot-2.PNG "Dequeue JS")
 
 
 **6. Dequeue CSS**
 
 In this option you can remove unwanterd CSS file from *Front Page*
+![Dequeue CSS](/assets/screenshot-3.PNG "Dequeue CSS")
