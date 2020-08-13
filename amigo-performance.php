@@ -346,13 +346,14 @@ class AmigoPerformancePlugin{
             return;
         }
         $admin_bar->add_menu( array(
-            'id'    => 'menu-id',
+            'id'    => 'amigoperf',
             'parent' => null,
             'group'  => null,
             'title' => '<span class="ab-icon dashicons dashicons-buddicons-activity"></span>' . _( 'AmigoPerf' ), //you can use img tag with image link. it will show the image icon Instead of the title.
             'href'  => admin_url('admin.php?page=amigo_performance'),
             'meta' => [
                 'title' => __( 'Amigo Performance', 'amigo-performance' ), //This title will show on hover
+                'onclick' => 'wp-admin-bar-amigoperf',
             ]
         ) );
     }
@@ -387,7 +388,7 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoPerfDefault -> amigoPerf_nq_css(); //Enqueue CSS
 
     $amigoPerfDefault -> amigoPerf_dequeue(); //DQ js and CSS - in Front page
-    // $amigoPerfDefault -> amigoPerf_adminmenu(); //Admin Bar menu WIP
+    $amigoPerfDefault -> amigoPerf_adminmenu(); //Admin Bar menu WIP
 }
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
