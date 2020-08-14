@@ -350,7 +350,8 @@ class AmigoPerformancePlugin{
             'parent' => null,
             'group'  => null,
             'title' => '<span class="ab-icon dashicons dashicons-buddicons-activity"></span>' . _( 'AmigoPerf' ), //you can use img tag with image link. it will show the image icon Instead of the title.
-            'href'  => admin_url('admin.php?page=amigo_performance'),
+            // 'href'  => admin_url('admin.php?page=amigo_performance'),
+            'href'  => '#amigoPerf_container',
             'meta' => [
                 'title' => __( 'Amigo Performance', 'amigo-performance' ), //This title will show on hover
                 'onclick' => 'wp-admin-bar-amigoperf',
