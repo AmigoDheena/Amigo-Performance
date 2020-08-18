@@ -55,4 +55,6 @@ In this option you can remove unwanterd CSS file from *Front Page*
 ## Support Me
 
 You can always buy me a coffee :) , It supports my work and in return you get to keep up-to-date version of the plugin.
+
+<br>
 <a href="https://www.buymeacoffee.com/AmigoDheena" target="_blank"><img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-%245-orange?style=for-the-badge&logo=buy-me-a-coffee" /></a>
