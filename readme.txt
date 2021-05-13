@@ -1,9 +1,8 @@
-=== Amigo Performance ===
+﻿=== Amigo Performance ===
 Contributors: AmigoDheena
-Donate link: https://www.buymeacoffee.com/AmigoDheena
 Tags: performance, optimization, page speed, Speed Optimization, GTmetrix, Google Page Speed
 Requires at least: 4.0
-Tested up to: 5.4.2
+Tested up to: 5.7
 Stable tag: trunk
 Requires PHP: 5.4
 License: GPLv2 or later
@@ -21,6 +20,8 @@ Very simple user interface to optimize selected option, Currently available opti
 * Remove Emoji
 * Defer Parsing of Javascript
 * Iframe lazyload
+* Dequeue JS
+* Dequeue CSS
 
 1. Remove Query String
 
@@ -40,6 +41,14 @@ Very simple user interface to optimize selected option, Currently available opti
 4. Iframe Lazyload
 
      Mostly iFrames are load data from an external site, so its contain lot of resources form external sites, we are unable to control that resources but we can prevent by lazyloading iFrame.
+
+5. Dequeue JS
+
+     In this option you can remove unwanterd JS file from Front Page
+
+6. Dequeue JS
+
+     In this option you can remove unwanterd CSS file from Front Page
 
 == Installation ==
 
@@ -65,12 +74,22 @@ You can check in an popular services like GTmetrix and Google Page Speed Insight
 
 == Screenshots ==
 
-1. Admin Setting Page
+1. Basic Settings
+1. Dequeue JS
+1. Dequeue CSS
 
 == Changelog ==
+= 1.0 =
+* Introduced Dequeue JavaScript(Front Page Only)
+* Introduced Dequeue Stylesheet(Front Page Only)
+* UI upated.
+
 = 0.1 =
 * Initial release.
 
 == Upgrade Notice ==
+= 1.0 =
+* Dequeue resources an UI upgrade
+
 = 0.1 =
 * Initial release.
