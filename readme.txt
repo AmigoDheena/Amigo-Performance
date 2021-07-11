@@ -2,7 +2,7 @@
 Contributors: AmigoDheena
 Tags: performance, optimization, page speed, Speed Optimization, GTmetrix, Google Page Speed
 Requires at least: 4.0
-Tested up to: 5.7
+Tested up to: 5.8
 Stable tag: trunk
 Requires PHP: 5.4
 License: GPLv2 or later
