@@ -2,9 +2,9 @@
 Contributors: AmigoDheena
 Tags: performance, optimization, page speed, Speed Optimization, GTmetrix, Google Page Speed
 Requires at least: 4.0
-Tested up to: 5.8.3
+Tested up to: 6.0.3
 Stable tag: trunk
-Requires PHP: 5.4
+Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
