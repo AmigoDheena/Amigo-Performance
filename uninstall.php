@@ -12,3 +12,4 @@ delete_option( 'amigoPerf_rqs' );
 delete_option( 'amigoPerf_remoji' );
 delete_option( 'amigoPerf_defer' );
 delete_option( 'amigoPerf_iframelazy' );
+delete_option( 'amigoPerf_lazyload' );

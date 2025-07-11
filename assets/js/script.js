@@ -1,3 +1,9 @@
+/**
+ * Amigo Performance Plugin - Admin JavaScript
+ * Version: 2.5
+ * Author: Amigo Dheena
+ */
+
 function openTab(evt, tabName) {
 
     var i, tabcontent, tablinks;

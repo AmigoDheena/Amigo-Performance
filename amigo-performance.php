@@ -2,14 +2,14 @@
 
 /**
  * @package amigo-performance
- * @author We Too IT
+ * @author Amigo Dheena
  
  * Plugin Name:       Amigo Performance
- * Plugin URI:        https://github.com/We-Too-IT/Amigo-Performance
+ * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
  * Description:       Amigo Performance is used to Optimize Website Performance and improve Site Score in services like Google Page Speed Insight, GTmetrix.
- * Version:           1.0
- * Author:            We Too IT
- * Author URI:        https://wetooit.com/
+ * Version:           2.5
+ * Author:            Amigo Dheena
+ * Author URI:        https://github.com/AmigoDheena
  * Text Domain:       amigo-performance
  * License:           GPL v2 or later
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -21,20 +21,53 @@ if (!defined('ABSPATH')) {
 
 include_once ( ABSPATH . 'wp-admin/includes/file.php' ); // to get get_home_path() function work
 include_once ( ABSPATH . 'wp-admin/includes/plugin.php' ); // to is_plugin_active()() function work
-    
+
 // Define plugin version for future releases
 if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
-    define('AMIGOPERF_PLUGIN_VERSION', '1.0');
+    define('AMIGOPERF_PLUGIN_VERSION', '2.5');
 }
 
+// Load text domain immediately when WordPress is ready
+function amigoperf_load_textdomain() {
+    load_plugin_textdomain(
+        'amigo-performance',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages/'
+    );
+}
+// Load text domain as early as possible
+add_action('plugins_loaded', 'amigoperf_load_textdomain', 1);
+
 class AmigoPerformancePlugin{
-    public $amigoPerf_hfn = 'amigoPerf_hfn'; //hidden field name
-    public $amigoPerf_PluginName = 'Amigo Performance';
-    public $amigoPerf_PluginVersion;
-    public $amigoPerf_rqs;
-    public $amigoPerf_remoji;
-    public $amigoPerf_defer;
-    public $amigoPerf_iframelazy;
+    protected $amigoPerf_hfn = 'amigoPerf_hfn'; //hidden field name
+    protected $amigoPerf_PluginName = 'Amigo Performance';
+    protected $amigoPerf_PluginVersion;
+    protected $amigoPerf_rqs;
+    protected $amigoPerf_rqs_opt;
+    protected $amigoPerf_rqs_val;
+    protected $amigoPerf_remoji;
+    protected $amigoPerf_remoji_opt;
+    protected $amigoPerf_remoji_val;
+    protected $amigoPerf_defer;
+    protected $amigoPerf_defer_opt;
+    protected $amigoPerf_defer_val;
+    protected $amigoPerf_iframelazy;
+    protected $amigoPerf_iframelazy_opt;
+    protected $amigoPerf_iframelazy_val;
+    protected $amigoPerf_lazyload;
+    protected $amigoPerf_lazyload_opt;
+    protected $amigoPerf_lazyload_val;
+    protected $amigoPerf_nq_script;
+    protected $amigoPerf_nqjs_array;
+    protected $amigoPerf_dq_script;
+    protected $amigoPerf_nqcss_array;
+    protected $amigoPerf_dq_style;
+    protected $amigoPerf_get_nq_js;
+    protected $amigoPerf_dq_js_str_to_arr;
+    protected $js_handle;
+    protected $css_handle;
+    protected $amigoPerf_dq_css_str_to_arr;
+    protected $amigoPerf_get_nq_css;
 
     function amigoperformance_activate()
     {
@@ -49,11 +82,15 @@ class AmigoPerformancePlugin{
         delete_option('amigoPerf_nq_style');
     }
 
-    // Check plugin versioin
+    // Check plugin version
     function amigoPerf_update_checker() {        
         $version = get_option( $this->amigoPerf_PluginVersion ); 
         if( version_compare($version, AMIGOPERF_PLUGIN_VERSION , '<')) {
-            // Do some special things when we update to 2.0.0.
+            // Handle updates from previous versions
+            if (version_compare($version, '2.5', '<')) {
+                // Perform 2.5 update tasks if needed
+                update_option( $this->amigoPerf_PluginVersion, AMIGOPERF_PLUGIN_VERSION );
+            }
         }
     }
 
@@ -63,11 +100,16 @@ class AmigoPerformancePlugin{
 
     // Enqueue Style sheets and Scripts
     function amigoperformance_enqueue_style(){
-        wp_enqueue_style('amigoperf_style', plugins_url('assets/css/style.css',__FILE__));
+        wp_enqueue_style(
+            'amigoperf_style',
+            plugins_url('assets/css/style.css', __FILE__),
+            array(),
+            '2.5' // Updated for version 2.5
+        );
     }
 
     function amigoperformance_enqueue_script(){
-        wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__),array(), '1.0', true );
+        wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__),array(), '2.5', true );
     }
 
     // Register Style sheets and Scripts
@@ -76,49 +118,67 @@ class AmigoPerformancePlugin{
         add_action('admin_enqueue_scripts', array($this , 'amigoperformance_enqueue_script') );
     }
 
-    public function amigoPerf_Default(){
-        global $amigoPerf_rqs_opt, $amigoPerf_remoji_opt, $amigoPerf_defer_opt, $amigoPerf_iframelazy_opt;
+    public function amigoPerf_Default() {
+        global $amigoPerf_rqs_opt, $amigoPerf_remoji_opt, $amigoPerf_defer_opt, $amigoPerf_iframelazy_opt, $amigoPerf_lazyload_opt;
 
-        $this->amigoPerf_PluginVersion = ( get_option($this->amigoPerf_PluginVersion) ? get_option($this->amigoPerf_PluginVersion) : AMIGOPERF_PLUGIN_VERSION );
+        $this->amigoPerf_PluginVersion = (get_option($this->amigoPerf_PluginVersion) ? get_option($this->amigoPerf_PluginVersion) : AMIGOPERF_PLUGIN_VERSION);
 
-        $this->amigoPerf_rqs_opt = ( FALSE !== get_option($this->amigoPerf_rqs) ? get_option($this->amigoPerf_rqs) : TRUE  ); 
         $this->amigoPerf_rqs = 'amigoPerf_rqs';
-        $this->amigoPerf_rqs_val = $amigoPerf_rqs_opt;
+        $this->amigoPerf_rqs_opt = (FALSE !== get_option($this->amigoPerf_rqs) ? get_option($this->amigoPerf_rqs) : TRUE);
+        $this->amigoPerf_rqs_val = $this->amigoPerf_rqs_opt;
 
-        $this->amigoPerf_remoji_opt = ( FALSE !== get_option($this->amigoPerf_remoji) ? get_option($this->amigoPerf_remoji) : TRUE  ); 
+        $this->amigoPerf_remoji_opt = (FALSE !== get_option($this->amigoPerf_remoji) ? get_option($this->amigoPerf_remoji) : TRUE);
         $this->amigoPerf_remoji = 'amigoPerf_remoji';
         $this->amigoPerf_remoji_val = $amigoPerf_remoji_opt;
-        
-        $this->amigoPerf_defer_opt = ( FALSE !== get_option($this->amigoPerf_defer) ? get_option($this->amigoPerf_defer) : TRUE  ); 
+
+        $this->amigoPerf_defer_opt = (FALSE !== get_option($this->amigoPerf_defer) ? get_option($this->amigoPerf_defer) : TRUE);
         $this->amigoPerf_defer = 'amigoPerf_defer';
         $this->amigoPerf_defer_val = $amigoPerf_defer_opt;
-        
-        $this->amigoPerf_iframelazy_opt = ( FALSE !== get_option($this->amigoPerf_iframelazy) ? get_option($this->amigoPerf_iframelazy) : TRUE  ); 
+
+        $this->amigoPerf_iframelazy_opt = (FALSE !== get_option($this->amigoPerf_iframelazy) ? get_option($this->amigoPerf_iframelazy) : TRUE);
         $this->amigoPerf_iframelazy = 'amigoPerf_iframelazy';
         $this->amigoPerf_iframelazy_val = $amigoPerf_iframelazy_opt;
+
+        $this->amigoPerf_lazyload_opt = (FALSE !== get_option($this->amigoPerf_lazyload) ? get_option($this->amigoPerf_lazyload) : TRUE);
+        $this->amigoPerf_lazyload = 'amigoPerf_lazyload';
+        $this->amigoPerf_lazyload_val = $amigoPerf_lazyload_opt;
     }
-        
+
     public function amigoperf_hiddenField(){
         if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] === 'Y') {
 
-            $this->amigoPerf_rqs_val = ( FALSE!== isset($_POST[$this->amigoPerf_rqs]) ? FALSE!== $_POST[$this->amigoPerf_rqs] : FALSE);
+            // Verify nonce for security
+            if (
+                !isset($_POST['amigo_basic_nonce']) ||
+                !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['amigo_basic_nonce'])), 'amigo_basic_settings_action') ||
+                !current_user_can('manage_options')
+            ) {
+                wp_die('Security verification failed.');
+            }
+
+            $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? true : false);
             if (is_bool($this->amigoPerf_rqs_val)) {
                 update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
             }
 
-            $this->amigoPerf_remoji_val = (FALSE!== isset($_POST[$this->amigoPerf_remoji]) ? FALSE!== $_POST[$this->amigoPerf_remoji] : FALSE);
+            $this->amigoPerf_remoji_val = (isset($_POST[$this->amigoPerf_remoji]) ? true : false);
             if (is_bool($this->amigoPerf_remoji_val)) {
                 update_option( $this->amigoPerf_remoji, $this->amigoPerf_remoji_val );
             }
             
-            $this->amigoPerf_defer_val = (FALSE!== isset($_POST[$this->amigoPerf_defer]) ? FALSE!== $_POST[$this->amigoPerf_defer] : FALSE);
+            $this->amigoPerf_defer_val = (isset($_POST[$this->amigoPerf_defer]) ? true : false);
             if (is_bool($this->amigoPerf_defer_val)) {
                 update_option( $this->amigoPerf_defer, $this->amigoPerf_defer_val );
             }
             
-            $this->amigoPerf_iframelazy_val = (FALSE!== isset($_POST[$this->amigoPerf_iframelazy]) ? FALSE!== $_POST[$this->amigoPerf_iframelazy] : FALSE);
+            $this->amigoPerf_iframelazy_val = (isset($_POST[$this->amigoPerf_iframelazy]) ? true : false);
             if (is_bool($this->amigoPerf_iframelazy_val)) {
                 update_option( $this->amigoPerf_iframelazy, $this->amigoPerf_iframelazy_val );
+            }
+            
+            $this->amigoPerf_lazyload_val = (isset($_POST[$this->amigoPerf_lazyload]) ? true : false);
+            if (is_bool($this->amigoPerf_lazyload_val)) {
+                update_option( $this->amigoPerf_lazyload, $this->amigoPerf_lazyload_val );
             }
 
             flush_rewrite_rules();
@@ -194,11 +254,34 @@ class AmigoPerformancePlugin{
                         }
                     }
                 </script>';
-                _e($lazyscript, 'amigo-performance');
+                echo wp_kses_post($lazyscript);
             // }
         }
         //Inline Footer
         add_action('wp_footer', 'inline_footer', 100);
+    }
+
+    public function amigoPerf_lazyload_operation() {
+        function amigoPerf_lazyload_add_script() {
+            // Enqueue LOCAL vanilla-lazyload script
+            wp_enqueue_script(
+                'vanilla-lazyload',
+                plugin_dir_url(__FILE__) . 'assets/js/vanilla-lazyload.min.js',
+                array(),
+                '19.1.3', // Version number (optional)
+                true // Load in footer
+            );
+
+            // Enqueue custom lazy-function.js (depends on vanilla-lazyload)
+            wp_enqueue_script(
+                'amigo-lazy-function',
+                plugin_dir_url(__FILE__) . 'assets/js/lazy-function.js',
+                array('vanilla-lazyload'), // Dependency
+                '2.5', // Updated version for 2.5 release
+                true // Load in footer
+            );
+        }
+        add_action('wp_enqueue_scripts', 'amigoPerf_lazyload_add_script');
     }
 
     public function link_rel_buffer_callback($buffer) {
@@ -228,12 +311,84 @@ class AmigoPerformancePlugin{
             }
         }
     }
+
+    // New
+    public function amigoPerf_lazyload_execute(){
+        if($this->amigoPerf_lazyload_opt == get_option($this->amigoPerf_lazyload)) {
+            // Inline amigolazy script at footer
+            $this->amigoPerf_lazyload_operation();
+
+            // Add lazy loading attribute to images if enabled
+            add_filter('the_content', array($this, 'amigoPerf_lazyload_load_images')); // Add this line
+        }
+    }
+
+    // Add lazy loading attribute to images if enabled
+    // public function amigoPerf_lazyload_load_images($content) {
+    //     // Check if Amigo Lazy is enabled
+    //         // Add "lazy" class and replace "src" with "data-src"
+    //         $content = preg_replace_callback(
+    //             '/<img(.*?)src=[\'"](.*?)[\'"](.*?)>/i',
+    //             function($matches) {
+    //                 $img_tag = $matches[0];
+    //                 $img_attributes = $matches[1];
+    //                 $img_src = $matches[2];
+    //                 $img_remaining = $matches[3];
+                    
+    //                 // Add "lazy" class and replace "src" with "data-src"
+    //                 $img_tag = '<img' . $img_attributes . 'class="lazy" data-src="' . $img_src . '"' . $img_remaining . '>';
+                    
+    //                 return $img_tag;
+    //             },
+    //             $content
+    //         );
+
+    //     return $content;
+    // }
+
+    public function amigoPerf_lazyload_load_images($content) {
+        // Skip if not in the frontend or if content is empty
+        if (is_admin() || empty($content)) {
+            return $content;
+        }
+
+        // Use DOMDocument to parse and modify images safely
+        $dom = new DOMDocument();
+        @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $images = $dom->getElementsByTagName('img');
+        
+        foreach ($images as $img) {
+            // Skip if already lazy-loaded
+            if ($img->hasAttribute('data-src')) {
+                continue;
+            }
+
+            // Get the original src
+            $src = $img->getAttribute('src');
+            if (empty($src)) {
+                continue;
+            }
+
+            // Add lazy-loading attributes
+            $img->setAttribute('data-src', $src);
+            $img->removeAttribute('src');
+            
+            // Add "lazy" class
+            $class = $img->getAttribute('class');
+            $img->setAttribute('class', trim($class . ' lazy'));
+        }
+
+        return $dom->saveHTML();
+    }
+
+    // New
     
    // Register Menu Page
     public function amigoperformance_add_pages() {
         add_menu_page(
             'Amigo Performance Plugin', //Page title
-            'Amigo Perf', //Menu title
+            'Performance', //Menu title
             'manage_options', //capability
             'amigo_performance', //menu_slug
             array($this, 'amigoPerf_newpage'), //function
@@ -288,17 +443,114 @@ class AmigoPerformancePlugin{
         add_action( 'wp_head', array($this,'amigoPerf_enqueued') );
     }
 
-    public function save_enqueued_css(){
-        $this->css_handle = sanitize_textarea_field($_POST['css_hadle']);
-        if (isset($_POST['enqueued_css_submit'])) {
-            update_option('amigoPerf_save_nq_style', $this->css_handle);
+    // public function save_enqueued_css() {
+    //     // Check if form was submitted
+    //     if (isset($_POST['enqueued_css_submit'])) {
+    //         // Verify nonce (security check)
+    //         if (!isset($_POST['amigo_css_nonce']) || !wp_verify_nonce($_POST['amigo_css_nonce'], 'amigo_save_css_action')) {
+    //             wp_die('Security check failed!');
+    //         }
+
+    //         // Sanitize and save CSS handle
+    //         if (isset($_POST['css_hadle'])) {
+    //             $this->css_handle = sanitize_text_field($_POST['css_hadle']); // Use sanitize_text_field instead of sanitize_textarea_field for single-line input
+    //             update_option('amigoPerf_save_nq_style', $this->css_handle);
+    //         } else {
+    //             $this->css_handle = '';
+    //             error_log('The "css_hadle" index is not set in $_POST array.');
+    //         }
+    //     }
+    // }
+
+    // public function save_enqueued_css() {
+    //     if (isset($_POST['enqueued_css_submit'])) {
+    //         // Security checks
+    //         if (
+    //             !isset($_POST['amigo_css_nonce']) ||
+    //             !wp_verify_nonce($_POST['amigo_css_nonce'], 'amigo_save_css_action') ||
+    //             !current_user_can('manage_options') // Only allow admins
+    //         ) {
+    //             wp_die('Security check failed!');
+    //         }
+
+    //         // Process data
+    //         $this->css_handle = isset($_POST['css_handle']) ? sanitize_text_field($_POST['css_handle']) : '';
+    //         update_option('amigoPerf_save_nq_style', $this->css_handle);
+    //     }
+    // }
+
+    public function save_enqueued_css() {
+        // Only process during admin requests
+        if (!is_admin() || !isset($_POST['enqueued_css_submit'])) {
+            return;
         }
+        
+        // Verify nonce and capabilities first
+        if (
+            !isset($_POST['amigo_css_nonce']) ||
+            !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['amigo_css_nonce'])), 'amigo_save_css_action') ||
+            !current_user_can('manage_options')
+        ) {
+            wp_die('Security check failed!');
+        }
+
+        // Process and sanitize CSS handle
+        $css_handle = isset($_POST['css_handle']) ? sanitize_text_field(wp_unslash($_POST['css_handle'])) : '';
+        update_option('amigoPerf_save_nq_style', $css_handle);
+        
+        // Optional: Admin notice on success
+        add_action('admin_notices', function() {
+            echo '<div class="notice notice-success"><p>CSS handles saved successfully!</p></div>';
+        });
     }
-    public function save_enqueued_js(){
-        $this->js_handle = sanitize_textarea_field($_POST['js_hadle']);
-        if (isset($_POST['enqueued_js_submit'])) {
-            update_option('amigoPerf_save_nq_script', $this->js_handle);
+
+    // public function save_enqueued_js(){
+    //     // Check if the 'js_hadle' index exists in $_POST
+    //     if (isset($_POST['js_hadle'])) {
+    //         $this->js_handle = sanitize_textarea_field($_POST['js_hadle']);
+    //         if (isset($_POST['enqueued_js_submit'])) {
+    //             update_option('amigoPerf_save_nq_script', $this->js_handle);
+    //         }
+    //     } else {
+    //         // Handle the case where 'js_hadle' index is not set
+    //         // For example, you can set a default value or display an error message
+    //         // Here, I'll set a default value to $this->js_handle
+    //         $this->js_handle = '';
+    //         // You can also log an error or display a warning message
+    //         error_log('The "js_hadle" index is not set in $_POST array.');
+    //         // Or display a warning message
+    //         // echo 'Warning: The "js_hadle" index is not set in $_POST array.';
+    //     }
+    // }
+
+    public function save_enqueued_js() {
+        // Only process during admin requests
+        if (!is_admin() || !isset($_POST['enqueued_js_submit'])) {
+            return;
         }
+        
+        // Security verification
+        if (
+            !isset($_POST['amigo_js_nonce']) ||
+            !wp_verify_nonce(sanitize_key(wp_unslash($_POST['amigo_js_nonce'])), 'amigo_save_js_action') ||
+            !current_user_can('manage_options')
+        ) {
+            wp_die('Security verification failed');
+        }
+
+        // Process and sanitize input
+        $js_handle = isset($_POST['js_handle']) ? 
+            sanitize_textarea_field(wp_unslash($_POST['js_handle'])) : 
+            '';
+
+        update_option('amigoPerf_save_nq_script', $js_handle);
+
+        // Add admin success notice
+        add_action('admin_notices', function() {
+            echo '<div class="notice notice-success is-dismissible">'
+                . '<p>JavaScript handles saved successfully!</p>'
+                . '</div>';
+        });
     }
 
     public function amigoPerf_dq_js(){
@@ -330,8 +582,16 @@ class AmigoPerformancePlugin{
     }
     
     public function amigoPerf_nq_js(){        
+        // Retrieve the option 'amigoPerf_nq_script'
         $this->amigoPerf_nqjs_array = get_option('amigoPerf_nq_script');
-        update_option('amigoPerf_dq_script',array($this->amigoPerf_dq_script));            
+        
+        // Declare and initialize the property if it's not declared
+        if (!property_exists($this, 'amigoPerf_nqjs_array')) {
+            $this->amigoPerf_nqjs_array = array();
+        }
+    
+        // Update the option 'amigoPerf_dq_script'
+        update_option('amigoPerf_dq_script', array($this->amigoPerf_dq_script));            
     }
 
     public function amigoPerf_nq_css(){
@@ -349,10 +609,10 @@ class AmigoPerformancePlugin{
             'id'    => 'menu-id',
             'parent' => null,
             'group'  => null,
-            'title' => '<span class="ab-icon dashicons dashicons-buddicons-activity"></span>' . _( 'AmigoPerf' ), //you can use img tag with image link. it will show the image icon Instead of the title.
+            'title' => '<span class="ab-icon dashicons dashicons-buddicons-activity"></span>AmigoPerf',
             'href'  => admin_url('admin.php?page=amigo_performance'),
             'meta' => [
-                'title' => __( 'Amigo Performance', 'amigo-performance' ), //This title will show on hover
+                'title' => 'Amigo Performance', //This title will show on hover
             ]
         ) );
     }
@@ -365,30 +625,33 @@ class AmigoPerformancePlugin{
 }
 
 if (class_exists('AmigoPerformancePlugin')) {
+    
     $amigoperformanceplugin = new AmigoPerformancePlugin();
     $amigoperformanceplugin -> amigoperformance_register();
-
     $amigoPerfDefault = new AmigoPerformancePlugin();
     $amigoPerfDefault -> amigoPerf_Default();
-    $amigoPerfDefault -> amigoperf_hiddenField();
+    
+    // Hook form processing to admin_init for proper timing
+    add_action('admin_init', array($amigoPerfDefault, 'amigoperf_hiddenField'));
+    add_action('admin_init', array($amigoPerfDefault, 'save_enqueued_css'));
+    add_action('admin_init', array($amigoPerfDefault, 'save_enqueued_js'));
+    
     $amigoPerfDefault -> amigoPerf_rqs_query('details');
     $amigoPerfDefault -> amigoPerf_rqs_operation(); //Remove Query Strings Operation
     $amigoPerfDefault -> amigoPerf_remoji_operation(); //Remove Emoji Operation
     $amigoPerfDefault -> amigoPerf_defer_operation(); //Defer parsing of JavaScript
     $amigoPerfDefault -> amigoPerf_iframelazy_execute(); //Iframe Lazyload  
+    $amigoPerfDefault -> amigoPerf_lazyload_execute(); //Image Lazyload  
     $amigoPerfDefault -> amigoPerf_reg_menu(); //Register Menu
     $amigoPerfDefault -> amigoPerf_update_checker(); //Update checker
-
     $amigoPerfDefault -> amigoPerf_enqueued_list(); //List of Enqueued files
-    $amigoPerfDefault -> save_enqueued_css(); //Save Enqueued CSS files
-    $amigoPerfDefault -> save_enqueued_js(); //Save Enqueued JS files
-
+    
     $amigoPerfDefault -> amigoPerf_nq_js(); //Enqueue JS
     $amigoPerfDefault -> amigoPerf_nq_css(); //Enqueue CSS
-
     $amigoPerfDefault -> amigoPerf_dequeue(); //DQ js and CSS - in Front page
     // $amigoPerfDefault -> amigoPerf_adminmenu(); //Admin Bar menu WIP
 }
+
 // Activation
 register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
 
