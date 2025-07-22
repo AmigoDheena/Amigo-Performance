@@ -1,0 +1,1274 @@
+<?php
+
+/**
+ * @package amigo-performance
+ * @author Amigo Dheena
+ 
+ * Plugin Name:       Amigo Performance
+ * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
+ * Description:       A lightweight performance optimization plugin that boosts website speed by removing query strings, disabling emojis, enabling script defer, and implementing lazy loading for images and iframes to improve scores in Google PageSpeed Insights and GTmetrix.
+ * Version:           2.7
+ * Author:            Amigo Dheena
+ * Author URI:        https://github.com/AmigoDheena
+ * Text Domain:       amigo-performance
+ * License:           GPL v2 or later
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ */
+
+if (!defined('ABSPATH')) {
+    die;
+}
+
+include_once ( ABSPATH . 'wp-admin/includes/file.php' ); // to get get_home_path() function work
+include_once ( ABSPATH . 'wp-admin/includes/plugin.php' ); // to is_plugin_active()() function work
+
+// Define plugin version for future releases
+if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
+    define('AMIGOPERF_PLUGIN_VERSION', '2.7');
+}
+
+// Define plugin path and URL constants for add-ons
+if (!defined('AMIGOPERF_PLUGIN_PATH')) {
+    define('AMIGOPERF_PLUGIN_PATH', plugin_dir_path(__FILE__));
+}
+
+if (!defined('AMIGOPERF_PLUGIN_URL')) {
+    define('AMIGOPERF_PLUGIN_URL', plugin_dir_url(__FILE__));
+}
+
+// Add-on system hook
+do_action('amigoperf_addons_loaded');
+
+// Auto-load add-ons from addons folder
+$addons_dir = plugin_dir_path(__FILE__) . 'addons/';
+if (is_dir($addons_dir)) {
+    $addon_files = glob($addons_dir . 'load-*.php');
+    foreach ($addon_files as $addon_file) {
+        if (file_exists($addon_file)) {
+            include_once $addon_file;
+        }
+    }
+}
+
+// Load text domain immediately when WordPress is ready
+function amigoperf_load_textdomain() {
+    load_plugin_textdomain(
+        'amigo-performance',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages/'
+    );
+}
+// Load text domain as early as possible
+add_action('plugins_loaded', 'amigoperf_load_textdomain', 1);
+
+class AmigoPerformancePlugin{
+    protected $amigoPerf_hfn = 'amigoPerf_hfn'; //hidden field name
+    protected $amigoPerf_PluginName = 'Amigo Performance';
+    protected $amigoPerf_PluginVersion;
+    protected $amigoPerf_rqs;
+    protected $amigoPerf_rqs_opt;
+    protected $amigoPerf_rqs_val;
+    protected $amigoPerf_remoji;
+    protected $amigoPerf_remoji_opt;
+    protected $amigoPerf_remoji_val;
+    protected $amigoPerf_defer;
+    protected $amigoPerf_defer_opt;
+    protected $amigoPerf_defer_val;
+    protected $amigoPerf_iframelazy;
+    protected $amigoPerf_iframelazy_opt;
+    protected $amigoPerf_iframelazy_val;
+    protected $amigoPerf_lazyload;
+    protected $amigoPerf_lazyload_opt;
+    protected $amigoPerf_lazyload_val;
+    protected $css_handle;
+    protected $amigoPerf_dq_css_str_to_arr;
+    protected $amigoPerf_get_nq_css;
+    
+    // Add-on system properties
+    protected $registered_addons = array();
+    protected $active_addons = array();
+    
+    // Asset Manager properties
+    protected $asset_manager_table;
+    protected $asset_manager_enabled = true;
+
+    function __construct() {
+        global $wpdb;
+        $this->asset_manager_table = $wpdb->prefix . 'amigoperf_asset_manager';
+        
+        // Initialize Asset Manager on plugin load
+        add_action('init', array($this, 'init_asset_manager'));
+    }
+
+    function amigoperformance_activate()
+    {
+        // Force recreate Asset Manager table on activation to ensure clean state
+        $this->create_asset_manager_table();
+        
+        // Also clear any cached asset data
+        delete_option('amigoperf_asset_cache');
+        
+        update_option( $this->amigoPerf_PluginVersion, AMIGOPERF_PLUGIN_VERSION );
+        
+        // Log successful activation
+        error_log("Asset Manager: Plugin activated and table recreated");
+        
+        return AMIGOPERF_PLUGIN_VERSION;
+    }
+
+    function amigoperformance_deactivate()
+    {
+        flush_rewrite_rules();
+        delete_option('amigoPerf_nq_script');
+        delete_option('amigoPerf_nq_style');
+    }
+
+    // Asset Manager Methods
+    public function init_asset_manager() {
+        if (!$this->asset_manager_enabled) {
+            return;
+        }
+        
+        // Ensure table exists
+        $this->maybe_create_asset_manager_table();
+        
+        // Initialize Asset Manager features
+        add_action('wp_ajax_amigoperf_toggle_asset', array($this, 'ajax_toggle_asset'));
+        add_action('wp_ajax_amigoperf_asset_admin_toggle', array($this, 'ajax_asset_admin_toggle'));
+        add_action('wp_ajax_amigoperf_asset_admin_delete', array($this, 'ajax_asset_admin_delete'));
+        add_action('wp_enqueue_scripts', array($this, 'dequeue_managed_assets'), 999);
+        add_action('admin_enqueue_scripts', array($this, 'dequeue_managed_assets'), 999);
+        add_action('wp_head', array($this, 'add_asset_manager_frontend_assets'));
+        add_action('admin_head', array($this, 'add_asset_manager_admin_assets'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_asset_manager_scripts'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_asset_manager_scripts'));
+    }
+    
+
+    
+    public function create_asset_manager_table() {
+        global $wpdb;
+        
+        // First, let's check if there's an old asset manager table and drop it to avoid conflicts
+        $old_table_name = $wpdb->prefix . 'asset_manager';
+        $old_table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$old_table_name}'") === $old_table_name;
+        if ($old_table_exists) {
+            $wpdb->query("DROP TABLE IF EXISTS {$old_table_name}");
+            error_log("Asset Manager: Dropped old asset manager table: {$old_table_name}");
+        }
+        
+        // Also check for asset-manager-pro table variations
+        $variations = array(
+            $wpdb->prefix . 'assetmanager',
+            $wpdb->prefix . 'asset_manager_pro',
+            $wpdb->prefix . 'amigoperf_assets'
+        );
+        
+        foreach ($variations as $table_name) {
+            $exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") === $table_name;
+            if ($exists) {
+                $wpdb->query("DROP TABLE IF EXISTS {$table_name}");
+                error_log("Asset Manager: Dropped conflicting table: {$table_name}");
+            }
+        }
+        
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        $sql = "CREATE TABLE {$this->asset_manager_table} (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            page_url varchar(500) NOT NULL,
+            asset_handle varchar(100) NOT NULL,
+            asset_type varchar(10) NOT NULL,
+            is_dequeued tinyint(1) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY unique_asset (page_url, asset_handle, asset_type),
+            KEY page_url (page_url),
+            KEY asset_type (asset_type),
+            KEY is_dequeued (is_dequeued)
+        ) $charset_collate;";
+        
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $result = dbDelta($sql);
+        
+        error_log("Asset Manager: Created new table {$this->asset_manager_table}. Result: " . print_r($result, true));
+        
+        // Verify the table was created successfully
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->asset_manager_table}'") === $this->asset_manager_table;
+        if ($table_exists) {
+            error_log("Asset Manager: Table {$this->asset_manager_table} verified successfully");
+        } else {
+            error_log("Asset Manager: ERROR - Table {$this->asset_manager_table} was not created!");
+        }
+    }
+    
+    public function maybe_create_asset_manager_table() {
+        global $wpdb;
+        
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->asset_manager_table}'") === $this->asset_manager_table;
+        if (!$table_exists) {
+            $this->create_asset_manager_table();
+        }
+    }
+    
+    public function dequeue_managed_assets() {
+        global $wpdb;
+        $current_url = $this->get_current_url();
+        
+        // Get dequeued assets for current page
+        $dequeued_assets = $wpdb->get_results($wpdb->prepare(
+            "SELECT asset_handle, asset_type FROM {$this->asset_manager_table} 
+             WHERE page_url = %s AND is_dequeued = 1",
+            $current_url
+        ));
+        
+        foreach ($dequeued_assets as $asset) {
+            if ($asset->asset_type === 'css') {
+                wp_dequeue_style($asset->asset_handle);
+                wp_deregister_style($asset->asset_handle);
+            } elseif ($asset->asset_type === 'js') {
+                wp_dequeue_script($asset->asset_handle);
+                wp_deregister_script($asset->asset_handle);
+            }
+        }
+    }
+    
+    public function add_asset_manager_admin_bar_items($wp_admin_bar) {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        
+        $current_url = $this->get_current_url();
+        $assets = $this->get_enqueued_assets();
+        
+        // Add Asset Manager to main Amigo Performance menu
+        $wp_admin_bar->add_node(array(
+            'parent' => 'amigo-performance-main',
+            'id' => 'amigoperf-asset-manager',
+            'title' => __('Asset Manager', 'amigo-performance'),
+            'href' => admin_url('admin.php?page=amigo_performance&tab=asset-manager'),
+        ));
+        
+        // Add CSS submenu if we have styles
+        if (!empty($assets['styles'])) {
+            $wp_admin_bar->add_node(array(
+                'parent' => 'amigoperf-asset-manager',
+                'id' => 'amigoperf-asset-css',
+                'title' => sprintf(__('CSS Files (%d)', 'amigo-performance'), count($assets['styles'])),
+                'meta' => array('class' => 'amigoperf-asset-submenu')
+            ));
+            
+            foreach ($assets['styles'] as $handle => $src) {
+                $is_dequeued = $this->is_asset_dequeued($current_url, $handle, 'css');
+                $wp_admin_bar->add_node(array(
+                    'parent' => 'amigoperf-asset-css',
+                    'id' => 'amigoperf-asset-css-' . $handle,
+                    'title' => $this->get_asset_checkbox_html($handle, 'css', $is_dequeued, $src),
+                    'meta' => array('class' => 'amigoperf-asset-item ' . ($is_dequeued ? 'asset-disabled' : 'asset-enabled'))
+                ));
+            }
+        }
+        
+        // Add JS submenu if we have scripts
+        if (!empty($assets['scripts'])) {
+            $wp_admin_bar->add_node(array(
+                'parent' => 'amigoperf-asset-manager',
+                'id' => 'amigoperf-asset-js',
+                'title' => sprintf(__('JS Files (%d)', 'amigo-performance'), count($assets['scripts'])),
+                'meta' => array('class' => 'amigoperf-asset-submenu')
+            ));
+            
+            foreach ($assets['scripts'] as $handle => $src) {
+                $is_dequeued = $this->is_asset_dequeued($current_url, $handle, 'js');
+                $wp_admin_bar->add_node(array(
+                    'parent' => 'amigoperf-asset-js',
+                    'id' => 'amigoperf-asset-js-' . $handle,
+                    'title' => $this->get_asset_checkbox_html($handle, 'js', $is_dequeued, $src),
+                    'meta' => array('class' => 'amigoperf-asset-item ' . ($is_dequeued ? 'asset-disabled' : 'asset-enabled'))
+                ));
+            }
+        }
+        
+        // Add dashboard link
+        $wp_admin_bar->add_node(array(
+            'parent' => 'amigoperf-asset-manager',
+            'id' => 'amigoperf-asset-dashboard',
+            'title' => __('📊 Asset Dashboard', 'amigo-performance'),
+            'href' => admin_url('admin.php?page=amigo_performance&tab=asset-manager')
+        ));
+    }
+    
+    public function ajax_toggle_asset() {
+        error_log("Asset Manager: AJAX toggle asset called - POST data: " . print_r($_POST, true));
+        
+        // Verify AJAX request
+        if (!wp_doing_ajax()) {
+            error_log("Asset Manager: ERROR - Not a valid AJAX request");
+            wp_die(__('Invalid request', 'amigo-performance'));
+        }
+        
+        // Check nonce using any of the possible nonce fields
+        $nonce = '';
+        if (isset($_POST['nonce'])) {
+            $nonce = $_POST['nonce'];
+        } elseif (isset($_POST['_wpnonce'])) {
+            $nonce = $_POST['_wpnonce'];
+        } elseif (isset($_POST['_ajax_nonce'])) {
+            $nonce = $_POST['_ajax_nonce'];
+        }
+        
+        if (!$nonce || !wp_verify_nonce($nonce, 'amigoperf_asset_toggle')) {
+            error_log("Asset Manager: ERROR - Nonce verification failed. Nonce: " . ($nonce ?: 'missing'));
+            wp_send_json_error(array(
+                'message' => __('Security verification failed', 'amigo-performance'),
+                'debug' => array(
+                    'nonce_received' => $nonce,
+                    'check_result' => wp_verify_nonce($nonce, 'amigoperf_asset_toggle') ? 'valid' : 'invalid'
+                )
+            ));
+        }
+        
+        if (!current_user_can('manage_options')) {
+            error_log("Asset Manager: ERROR - User doesn't have manage_options capability");
+            wp_send_json_error(array('message' => __('Permission denied', 'amigo-performance')));
+        }
+        
+        $page_url = isset($_POST['page_url']) ? sanitize_url($_POST['page_url']) : '';
+        $asset_handle = isset($_POST['asset_handle']) ? sanitize_text_field($_POST['asset_handle']) : '';
+        $asset_type = isset($_POST['asset_type']) ? sanitize_text_field($_POST['asset_type']) : '';
+        $action = isset($_POST['action_type']) ? sanitize_text_field($_POST['action_type']) : '';
+        
+        error_log("Asset Manager: Sanitized data - URL: {$page_url}, Handle: {$asset_handle}, Type: {$asset_type}, Action: {$action}");
+        
+        // Validate inputs
+        if (empty($page_url) || empty($asset_handle) || empty($asset_type)) {
+            error_log("Asset Manager: ERROR - Missing required parameters");
+            wp_send_json_error(array('message' => __('Missing required parameters', 'amigo-performance')));
+        }
+        
+        // If action_type is missing, determine it from isDequeued parameter
+        if (empty($action) && isset($_POST['isDequeued'])) {
+            $action = filter_var($_POST['isDequeued'], FILTER_VALIDATE_BOOLEAN) ? 'disable' : 'enable';
+            error_log("Asset Manager: Action derived from isDequeued parameter: {$action}");
+        }
+        
+        // If still empty, default to toggle
+        if (empty($action)) {
+            error_log("Asset Manager: No action specified, defaulting to toggle");
+            // Check if asset exists and is currently dequeued
+            $existing_status = $wpdb->get_var($wpdb->prepare(
+                "SELECT is_dequeued FROM {$this->asset_manager_table} 
+                 WHERE page_url = %s AND asset_handle = %s AND asset_type = %s",
+                $page_url, $asset_handle, $asset_type
+            ));
+            
+            $action = ($existing_status == 1) ? 'enable' : 'disable';
+            error_log("Asset Manager: Toggling based on existing state: {$existing_status} -> {$action}");
+        }
+        
+        global $wpdb;
+        
+        // Ensure table exists
+        $this->maybe_create_asset_manager_table();
+        
+        // Double-check table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->asset_manager_table}'") === $this->asset_manager_table;
+        if (!$table_exists) {
+            error_log("Asset Manager: ERROR - Database table {$this->asset_manager_table} doesn't exist!");
+            wp_send_json_error(array('message' => __('Database table missing', 'amigo-performance')));
+        }
+        
+        // Check if asset exists
+        // Double force table creation
+        $this->create_asset_manager_table();
+        
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT id, is_dequeued FROM {$this->asset_manager_table} 
+             WHERE page_url = %s AND asset_handle = %s AND asset_type = %s",
+            $page_url, $asset_handle, $asset_type
+        ));
+        
+        error_log("Asset Manager: Existing record query result: " . print_r($existing, true));
+        
+        $is_dequeued = ($action === 'disable') ? 1 : 0;
+        
+        if ($existing) {
+            // Update existing record
+            $result = $wpdb->update(
+                $this->asset_manager_table,
+                array(
+                    'is_dequeued' => $is_dequeued,
+                    'updated_at' => current_time('mysql')
+                ),
+                array('id' => $existing->id),
+                array('%d', '%s'),
+                array('%d')
+            );
+            
+            error_log("Asset Manager: Updated existing asset ID {$existing->id} - Handle: {$asset_handle}, Type: {$asset_type}, Action: {$action}, Result: " . ($result !== false ? 'success' : 'failed') . ", Last Error: " . $wpdb->last_error);
+            
+            // Verify update worked
+            if ($result === false) {
+                // Try direct query if update fails
+                $direct_result = $wpdb->query($wpdb->prepare(
+                    "UPDATE {$this->asset_manager_table} SET is_dequeued = %d, updated_at = %s WHERE id = %d",
+                    $is_dequeued, current_time('mysql'), $existing->id
+                ));
+                error_log("Asset Manager: Fallback direct update result: " . ($direct_result !== false ? 'success' : 'failed'));
+            }
+            
+        } else {
+            // Check if table exists again to be extra sure
+            $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->asset_manager_table}'") === $this->asset_manager_table;
+            if (!$table_exists) {
+                error_log("Asset Manager: Table missing before insert, creating again");
+                $this->create_asset_manager_table();
+            }
+            
+            // Insert new record
+            $result = $wpdb->insert(
+                $this->asset_manager_table,
+                array(
+                    'page_url' => $page_url,
+                    'asset_handle' => $asset_handle,
+                    'asset_type' => $asset_type,
+                    'is_dequeued' => $is_dequeued,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ),
+                array('%s', '%s', '%s', '%d', '%s', '%s')
+            );
+            
+            error_log("Asset Manager: Inserted new asset - Handle: {$asset_handle}, Type: {$asset_type}, Action: {$action}, Result: " . ($result !== false ? 'success' : 'failed') . ", Last Error: " . $wpdb->last_error);
+            
+            if ($result === false && !empty($wpdb->last_error)) {
+                // Try direct query as fallback
+                $direct_result = $wpdb->query($wpdb->prepare(
+                    "INSERT INTO {$this->asset_manager_table} (page_url, asset_handle, asset_type, is_dequeued, created_at, updated_at) 
+                    VALUES (%s, %s, %s, %d, %s, %s)",
+                    $page_url, $asset_handle, $asset_type, $is_dequeued, current_time('mysql'), current_time('mysql')
+                ));
+                error_log("Asset Manager: Fallback direct insert result: " . ($direct_result !== false ? 'success' : 'failed'));
+            }
+        }
+        
+        if ($result !== false) {
+            // Verify the change was saved
+            $verification = $wpdb->get_var($wpdb->prepare(
+                "SELECT is_dequeued FROM {$this->asset_manager_table} 
+                 WHERE page_url = %s AND asset_handle = %s AND asset_type = %s",
+                $page_url, $asset_handle, $asset_type
+            ));
+            
+            error_log("Asset Manager: Verification query result: " . $verification);
+            
+            wp_send_json_success(array(
+                'message' => sprintf(
+                    __('Asset %s %s successfully', 'amigo-performance'),
+                    $asset_handle,
+                    $action === 'disable' ? __('disabled', 'amigo-performance') : __('enabled', 'amigo-performance')
+                ),
+                'handle' => $asset_handle,
+                'type' => $asset_type,
+                'action' => $action,
+                'is_dequeued' => $is_dequeued,
+                'verification' => $verification,
+                'debug' => array(
+                    'page_url' => $page_url,
+                    'existing_record' => $existing ? true : false,
+                    'wpdb_result' => $result,
+                    'table_name' => $this->asset_manager_table
+                )
+            ));
+        } else {
+            // Get the last database error
+            $db_error = $wpdb->last_error;
+            error_log("Asset Manager: Database error - " . $db_error);
+            
+            wp_send_json_error(array(
+                'message' => __('Failed to update asset status', 'amigo-performance'),
+                'db_error' => $db_error,
+                'debug' => array(
+                    'page_url' => $page_url,
+                    'asset_handle' => $asset_handle,
+                    'asset_type' => $asset_type,
+                    'action' => $action,
+                    'table_name' => $this->asset_manager_table
+                )
+            ));
+        }
+    }
+    
+    private function get_current_url() {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+        return $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+    
+    private function get_enqueued_assets() {
+        global $wp_scripts, $wp_styles;
+        
+        $scripts = array();
+        $styles = array();
+        $current_url = $this->get_current_url();
+        
+        // Get currently enqueued scripts
+        if (!empty($wp_scripts->queue)) {
+            foreach ($wp_scripts->queue as $handle) {
+                if (isset($wp_scripts->registered[$handle]) && !empty($wp_scripts->registered[$handle]->src)) {
+                    $scripts[$handle] = $wp_scripts->registered[$handle]->src;
+                }
+            }
+        }
+        
+        // Get currently enqueued styles
+        if (!empty($wp_styles->queue)) {
+            foreach ($wp_styles->queue as $handle) {
+                if (isset($wp_styles->registered[$handle]) && !empty($wp_styles->registered[$handle]->src)) {
+                    $styles[$handle] = $wp_styles->registered[$handle]->src;
+                }
+            }
+        }
+        
+        return array(
+            'scripts' => $scripts,
+            'styles' => $styles
+        );
+    }
+    
+    private function is_asset_dequeued($page_url, $handle, $type) {
+        global $wpdb;
+        
+        $result = $wpdb->get_var($wpdb->prepare(
+            "SELECT is_dequeued FROM {$this->asset_manager_table} WHERE page_url = %s AND asset_handle = %s AND asset_type = %s",
+            $page_url, $handle, $type
+        ));
+        
+        return $result == 1;
+    }
+    
+    private function get_asset_checkbox_html($handle, $type, $is_dequeued, $src) {
+        $checked = $is_dequeued ? 'checked' : '';
+        $filename = basename($src);
+        $title = !empty($filename) ? $filename : $handle;
+        
+        // Clean up the title for better display
+        if (strpos($title, '?') !== false) {
+            $title = explode('?', $title)[0];
+        }
+        
+        // Get nonce and admin AJAX URL
+        $nonce = wp_create_nonce('amigoperf_asset_toggle');
+        $admin_ajax_url = admin_url('admin-ajax.php');
+        
+        return sprintf(
+            '<label class="asset-label">
+                <input type="checkbox" %s onchange="amigoPerfToggleAsset(\'%s\', \'%s\', this.checked, \'%s\', \'%s\')" class="asset-checkbox">
+                <span class="asset-name" title="%s - %s">%s</span>
+            </label>',
+            $checked,
+            esc_attr($handle),
+            esc_attr($type),
+            esc_url($admin_ajax_url),
+            esc_attr($nonce),
+            esc_attr($handle),
+            esc_attr($src),
+            esc_html($title)
+        );
+    }
+    
+    public function add_asset_manager_frontend_assets() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        // Asset manager frontend styles and scripts will be added here
+    }
+    
+    /**
+     * Add asset manager admin assets - This function is no longer needed as we're using proper wp_enqueue_*
+     * But keeping it for backwards compatibility and logging purposes
+     */
+    public function add_asset_manager_admin_assets() {
+        if (!is_admin_bar_showing() || !current_user_can('manage_options')) {
+            return;
+        }
+        
+        // This is just for debugging - all styles and scripts are now properly enqueued
+        error_log('Asset Manager: Admin assets hook fired');
+    }
+    
+    public function enqueue_asset_manager_scripts() {
+        if (!is_admin_bar_showing() || !current_user_can('manage_options')) {
+            return;
+        }
+        
+        // Enqueue jQuery
+        wp_enqueue_script('jquery');
+        
+        // Enqueue admin bar styles and scripts
+        wp_enqueue_style(
+            'amigoperf-admin-bar',
+            AMIGOPERF_PLUGIN_URL . 'assets/css/admin-bar.css',
+            [],
+            AMIGOPERF_PLUGIN_VERSION
+        );
+        
+        wp_enqueue_script(
+            'amigoperf-admin-bar',
+            AMIGOPERF_PLUGIN_URL . 'assets/js/admin-bar.js',
+            ['jquery'],
+            AMIGOPERF_PLUGIN_VERSION,
+            true
+        );
+        
+        // Localize script with the admin ajax URL and nonce
+        $admin_ajax_url = admin_url('admin-ajax.php');
+        $nonce = wp_create_nonce('amigoperf_asset_toggle');
+        
+        // Pass variables to JavaScript
+        wp_localize_script('amigoperf-admin-bar', 'amigoPerf', [
+            'ajaxUrl' => $admin_ajax_url,
+            'nonce'   => $nonce,
+            'debug'   => defined('WP_DEBUG') && WP_DEBUG
+        ]);
+    }
+    
+    /**
+     * AJAX handler for toggling assets from the admin dashboard
+     */
+    public function ajax_asset_admin_toggle() {
+        // Security checks
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied', 'amigo-performance')));
+        }
+        
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'amigoperf_asset_admin_action')) {
+            wp_send_json_error(array('message' => __('Security verification failed', 'amigo-performance')));
+        }
+        
+        // Get and validate asset ID
+        $asset_id = isset($_POST['asset_id']) ? intval($_POST['asset_id']) : 0;
+        $disable = isset($_POST['disable']) && $_POST['disable'] == '1';
+        
+        if (empty($asset_id)) {
+            wp_send_json_error(array('message' => __('Missing asset ID', 'amigo-performance')));
+        }
+        
+        global $wpdb;
+        
+        // Update the asset status
+        $result = $wpdb->update(
+            $this->asset_manager_table,
+            array('is_dequeued' => $disable ? 1 : 0),
+            array('id' => $asset_id),
+            array('%d'),
+            array('%d')
+        );
+        
+        if ($result === false) {
+            wp_send_json_error(array(
+                'message' => __('Failed to update asset status', 'amigo-performance'),
+                'db_error' => $wpdb->last_error
+            ));
+        }
+        
+        // Return success JSON response
+        wp_send_json_success(array(
+            'message' => __('Asset status updated successfully', 'amigo-performance'),
+            'is_disabled' => $disable
+        ));
+    }
+    
+    /**
+     * AJAX handler for deleting assets from the admin dashboard
+     */
+    public function ajax_asset_admin_delete() {
+        // Security checks
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied', 'amigo-performance')));
+        }
+        
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'amigoperf_asset_admin_action')) {
+            wp_send_json_error(array('message' => __('Security verification failed', 'amigo-performance')));
+        }
+        
+        // Get and validate asset ID
+        $asset_id = isset($_POST['asset_id']) ? intval($_POST['asset_id']) : 0;
+        
+        if (empty($asset_id)) {
+            wp_send_json_error(array('message' => __('Missing asset ID', 'amigo-performance')));
+        }
+        
+        global $wpdb;
+        
+        // Delete the asset
+        $result = $wpdb->delete(
+            $this->asset_manager_table,
+            array('id' => $asset_id),
+            array('%d')
+        );
+        
+        if ($result === false) {
+            wp_send_json_error(array(
+                'message' => __('Failed to delete asset', 'amigo-performance'),
+                'db_error' => $wpdb->last_error
+            ));
+        }
+        
+        // Return success JSON response
+        wp_send_json_success(array(
+            'message' => __('Asset deleted successfully', 'amigo-performance'),
+            'asset_id' => $asset_id
+        ));
+    }
+    
+    public function get_asset_manager_stats() {
+        global $wpdb;
+        
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->asset_manager_table}'") === $this->asset_manager_table;
+        if (!$table_exists) {
+            return array(
+                'total_assets' => 0,
+                'dequeued_assets' => 0,
+                'unique_pages' => 0,
+                'css_assets' => 0,
+                'js_assets' => 0
+            );
+        }
+        
+        $total = $wpdb->get_var("SELECT COUNT(*) FROM {$this->asset_manager_table}") ?: 0;
+        $dequeued = $wpdb->get_var("SELECT COUNT(*) FROM {$this->asset_manager_table} WHERE is_dequeued = 1") ?: 0;
+        $pages = $wpdb->get_var("SELECT COUNT(DISTINCT page_url) FROM {$this->asset_manager_table}") ?: 0;
+        $css = $wpdb->get_var("SELECT COUNT(*) FROM {$this->asset_manager_table} WHERE asset_type = 'css'") ?: 0;
+        $js = $wpdb->get_var("SELECT COUNT(*) FROM {$this->asset_manager_table} WHERE asset_type = 'js'") ?: 0;
+        
+        return array(
+            'total_assets' => $total,
+            'dequeued_assets' => $dequeued,
+            'unique_pages' => $pages,
+            'css_assets' => $css,
+            'js_assets' => $js
+        );
+    }
+    
+    public function get_all_managed_assets() {
+        global $wpdb;
+        
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->asset_manager_table}'") === $this->asset_manager_table;
+        if (!$table_exists) {
+            $this->maybe_create_asset_manager_table();
+            return array();
+        }
+        
+        return $wpdb->get_results(
+            "SELECT * FROM {$this->asset_manager_table} ORDER BY page_url, asset_type, asset_handle"
+        );
+    }
+    
+    private function truncate_url($url, $length = 50) {
+        if (strlen($url) <= $length) {
+            return $url;
+        }
+        return substr($url, 0, $length) . '...';
+    }
+
+    // Check plugin version
+    function amigoPerf_update_checker() {        
+        $version = get_option( $this->amigoPerf_PluginVersion ); 
+        if( version_compare($version, AMIGOPERF_PLUGIN_VERSION , '<')) {
+            // Handle updates from previous versions
+            if (version_compare($version, '2.5', '<')) {
+                // Perform 2.5 update tasks if needed
+                // (Keep any existing 2.5 specific update logic)
+            }
+            
+            if (version_compare($version, '2.7', '<')) {
+                // Perform 2.7 update tasks if needed
+                // This ensures that when upgrading from 2.5 to 2.7, any necessary updates are performed
+            }
+            
+            // Always update the stored version number
+            update_option( $this->amigoPerf_PluginVersion, AMIGOPERF_PLUGIN_VERSION );
+        }
+    }
+
+    function amigoPerf_is_current_version(){
+        return version_compare($this->version, AMIGOPERF_PLUGIN_VERSION, '=') ? true : false;
+    }
+
+    // Enqueue Style sheets and Scripts
+    function amigoperformance_enqueue_style(){
+        wp_enqueue_style(
+            'amigoperf_style',
+            plugins_url('assets/css/style.css', __FILE__),
+            array(),
+            '2.7' // Updated for version 2.7
+        );
+    }
+
+    function amigoperformance_enqueue_script(){
+        wp_enqueue_script('amigoperf_script', plugins_url('assets/js/script.js',__FILE__),array(), '2.7', true );
+    }
+
+    // Register Style sheets and Scripts
+    function amigoperformance_register(){
+        add_action('admin_enqueue_scripts', array($this , 'amigoperformance_enqueue_style'));
+        add_action('admin_enqueue_scripts', array($this , 'amigoperformance_enqueue_script') );
+    }
+
+    public function amigoPerf_Default() {
+        global $amigoPerf_rqs_opt, $amigoPerf_remoji_opt, $amigoPerf_defer_opt, $amigoPerf_iframelazy_opt, $amigoPerf_lazyload_opt;
+
+        $this->amigoPerf_PluginVersion = (get_option($this->amigoPerf_PluginVersion) ? get_option($this->amigoPerf_PluginVersion) : AMIGOPERF_PLUGIN_VERSION);
+
+        $this->amigoPerf_rqs = 'amigoPerf_rqs';
+        $this->amigoPerf_rqs_opt = (FALSE !== get_option($this->amigoPerf_rqs) ? get_option($this->amigoPerf_rqs) : TRUE);
+        $this->amigoPerf_rqs_val = $this->amigoPerf_rqs_opt;
+
+        $this->amigoPerf_remoji_opt = (FALSE !== get_option($this->amigoPerf_remoji) ? get_option($this->amigoPerf_remoji) : TRUE);
+        $this->amigoPerf_remoji = 'amigoPerf_remoji';
+        $this->amigoPerf_remoji_val = $amigoPerf_remoji_opt;
+
+        $this->amigoPerf_defer_opt = (FALSE !== get_option($this->amigoPerf_defer) ? get_option($this->amigoPerf_defer) : TRUE);
+        $this->amigoPerf_defer = 'amigoPerf_defer';
+        $this->amigoPerf_defer_val = $amigoPerf_defer_opt;
+
+        $this->amigoPerf_iframelazy_opt = (FALSE !== get_option($this->amigoPerf_iframelazy) ? get_option($this->amigoPerf_iframelazy) : TRUE);
+        $this->amigoPerf_iframelazy = 'amigoPerf_iframelazy';
+        $this->amigoPerf_iframelazy_val = $amigoPerf_iframelazy_opt;
+
+        $this->amigoPerf_lazyload_opt = (FALSE !== get_option($this->amigoPerf_lazyload) ? get_option($this->amigoPerf_lazyload) : TRUE);
+        $this->amigoPerf_lazyload = 'amigoPerf_lazyload';
+        $this->amigoPerf_lazyload_val = $amigoPerf_lazyload_opt;
+    }
+
+    public function amigoperf_hiddenField(){
+        if (isset($_POST[$this->amigoPerf_hfn]) && $_POST[$this->amigoPerf_hfn] === 'Y') {
+
+            // Verify nonce for security
+            if (
+                !isset($_POST['amigo_basic_nonce']) ||
+                !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['amigo_basic_nonce'])), 'amigo_basic_settings_action') ||
+                !current_user_can('manage_options')
+            ) {
+                wp_die('Security verification failed.');
+            }
+
+            $this->amigoPerf_rqs_val = (isset($_POST[$this->amigoPerf_rqs]) ? true : false);
+            if (is_bool($this->amigoPerf_rqs_val)) {
+                update_option( $this->amigoPerf_rqs, $this->amigoPerf_rqs_val );
+            }
+
+            $this->amigoPerf_remoji_val = (isset($_POST[$this->amigoPerf_remoji]) ? true : false);
+            if (is_bool($this->amigoPerf_remoji_val)) {
+                update_option( $this->amigoPerf_remoji, $this->amigoPerf_remoji_val );
+            }
+            
+            $this->amigoPerf_defer_val = (isset($_POST[$this->amigoPerf_defer]) ? true : false);
+            if (is_bool($this->amigoPerf_defer_val)) {
+                update_option( $this->amigoPerf_defer, $this->amigoPerf_defer_val );
+            }
+            
+            $this->amigoPerf_iframelazy_val = (isset($_POST[$this->amigoPerf_iframelazy]) ? true : false);
+            if (is_bool($this->amigoPerf_iframelazy_val)) {
+                update_option( $this->amigoPerf_iframelazy, $this->amigoPerf_iframelazy_val );
+            }
+            
+            $this->amigoPerf_lazyload_val = (isset($_POST[$this->amigoPerf_lazyload]) ? true : false);
+            if (is_bool($this->amigoPerf_lazyload_val)) {
+                update_option( $this->amigoPerf_lazyload, $this->amigoPerf_lazyload_val );
+            }
+
+            flush_rewrite_rules();
+        }
+    }
+
+    public function amigoPerf_rqs_query($src)
+    {
+        if(strpos( $src, '?ver=' ))
+        $src = remove_query_arg( 'ver', $src );
+        return $src;
+    }
+
+    public function amigoPerf_rqs_operation()
+    {
+        if($this->amigoPerf_rqs_opt == get_option($this->amigoPerf_rqs)) {
+            if(!is_admin()) {
+                add_filter( 'style_loader_src', array($this,'amigoPerf_rqs_query'), 10, 2 );
+                add_filter( 'script_loader_src', array($this,'amigoPerf_rqs_query'), 10, 2 );
+            }
+        }
+    }
+
+    public function amigoPerf_remoji_operation()
+    {
+        if($this->amigoPerf_remoji_opt == get_option($this->amigoPerf_remoji)) {
+            remove_action( 'wp_head', 'print_emoji_detection_script', 7 ); 
+            remove_action( 'admin_print_scripts', 'print_emoji_detection_script' ); 
+            remove_action( 'wp_print_styles', 'print_emoji_styles' ); 
+            remove_action( 'admin_print_styles', 'print_emoji_styles' );
+        }
+    }
+
+    public function amigoPerf_defer_operation(){
+        if($this->amigoPerf_defer_opt == get_option($this->amigoPerf_defer)) {
+            if(!is_admin()) {
+                add_filter( 'script_loader_tag', function ( $tag, $handle ) {
+                    if(is_front_page()) {
+                        if ( 'jquery-core' == $handle){ return $tag; } 
+                    } else {
+                    return $tag;
+                    }
+                    return str_replace( ' src', ' defer="defer" src', $tag );
+                }, 10, 2 );
+            }
+        }
+    }
+
+    
+    // Iframe Lazy Loading
+    public function amigoPerf_iframelazy_operation()
+    {
+        // Enqueue the iframe lazy loading script
+        function amigoPerf_iframelazy_add_script() {
+            // Enqueue iframe lazy loading script
+            wp_enqueue_script(
+                'amigo-iframe-lazy',
+                plugin_dir_url(__FILE__) . 'assets/js/iframe-lazy.js',
+                array(), // No dependencies
+                '2.7', // Version number
+                true // Load in footer
+            );
+        }
+        add_action('wp_enqueue_scripts', 'amigoPerf_iframelazy_add_script');
+    }
+    public function link_rel_buffer_callback($buffer) {
+        // Improved regex to properly match iframe tags with src attributes
+        $buffer = preg_replace('/<iframe([^>]*)(\s+src\s*=\s*["\'])([^"\'>]+)(["\'])/i', 
+                              '<iframe$1 class="amigolazy" lazy="1500" data-src=$4$3$4', $buffer);
+        return $buffer;
+    }
+
+    public function link_rel_buffer_start() {
+        ob_start(array($this,'link_rel_buffer_callback'));
+    }
+
+    public function link_rel_buffer_end() {
+        ob_flush();
+    }
+
+    public function amigoPerf_iframelazy_execute(){
+        if($this->amigoPerf_iframelazy_opt == get_option($this->amigoPerf_iframelazy)) {
+
+            // Inline amigolazy script at footer
+            $this->amigoPerf_iframelazy_operation();
+
+            //str replace
+            if (!is_admin()) {
+                add_action('template_redirect', array($this,'link_rel_buffer_start'));
+                add_action('get_header', array($this,'link_rel_buffer_start'));
+                add_action('wp_footer', array($this,'link_rel_buffer_end'));
+            }
+        }
+    }
+    // Iframe Lazy Loading
+
+
+    public function amigoPerf_lazyload_operation() {
+        function amigoPerf_lazyload_add_script() {
+            // Enqueue LOCAL vanilla-lazyload script
+            wp_enqueue_script(
+                'vanilla-lazyload',
+                plugin_dir_url(__FILE__) . 'assets/js/lazyload.min.js',
+                array(),
+                '19.1.3', // Version number (optional)
+                true // Load in footer
+            );
+
+            // Enqueue custom lazy-function.js (depends on vanilla-lazyload)
+            wp_enqueue_script(
+                'amigo-lazy-function',
+                plugin_dir_url(__FILE__) . 'assets/js/lazy-function.js',
+                array('vanilla-lazyload'), // Dependency
+                '2.7', // Updated version for 2.7 release
+                true // Load in footer
+            );
+        }
+        add_action('wp_enqueue_scripts', 'amigoPerf_lazyload_add_script');
+    }
+
+    // New
+    public function amigoPerf_lazyload_execute(){
+        if($this->amigoPerf_lazyload_opt == get_option($this->amigoPerf_lazyload)) {
+            // Inline amigolazy script at footer
+            $this->amigoPerf_lazyload_operation();
+
+            // Add lazy loading attribute to images if enabled
+            add_filter('the_content', array($this, 'amigoPerf_lazyload_load_images')); // Add this line
+        }
+    }
+
+    public function amigoPerf_lazyload_load_images($content) {
+        // Skip if not in the frontend or if content is empty
+        if (is_admin() || empty($content)) {
+            return $content;
+        }
+
+        // Use DOMDocument to parse and modify images safely
+        $dom = new DOMDocument();
+        // Using @ to suppress warnings about malformed HTML
+        @$dom->loadHTML('<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' . $content . '</body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $images = $dom->getElementsByTagName('img');
+        
+        foreach ($images as $img) {
+            // Skip if already lazy-loaded
+            if ($img->hasAttribute('data-src')) {
+                continue;
+            }
+
+            // Get the original src
+            $src = $img->getAttribute('src');
+            if (empty($src)) {
+                continue;
+            }
+
+            // Add lazy-loading attributes
+            $img->setAttribute('data-src', $src);
+            $img->removeAttribute('src');
+            
+            // Add "lazy" class
+            $class = $img->getAttribute('class');
+            $img->setAttribute('class', trim($class . ' lazy'));
+        }
+
+        return $dom->saveHTML();
+    }
+
+    // New
+    
+   // Register Menu Page
+    public function amigoperformance_add_pages() {
+        // Main menu item
+        add_menu_page(
+            'Amigo Performance Plugin', // Page title
+            'Performance', // Menu title
+            'manage_options', // Capability
+            'amigo_performance', // Menu slug
+            array($this, 'amigoPerf_core_settings'), // Function
+            'dashicons-buddicons-activity' // Icon url
+        );
+        
+        // Core Settings submenu (will appear as "Performance")
+        add_submenu_page(
+            'amigo_performance', // Parent slug
+            'Core Settings', // Page title
+            'Core Settings', // Menu title
+            'manage_options', // Capability
+            'amigo_performance', // Menu slug (same as parent to keep it as first item)
+            array($this, 'amigoPerf_core_settings') // Function
+        );
+        
+        // Asset Manager submenu
+        add_submenu_page(
+            'amigo_performance', // Parent slug
+            'Asset Manager', // Page title
+            'Asset Manager', // Menu title
+            'manage_options', // Capability
+            'amigo_asset_manager', // Menu slug (unique for this page)
+            array($this, 'amigoPerf_asset_manager') // Function
+        );
+    }
+
+    // Core Settings page callback
+    public function amigoPerf_core_settings() {
+        require_once plugin_dir_path(__FILE__) . 'admin-core-settings.php';
+    }
+    
+    // Asset Manager page callback
+    public function amigoPerf_asset_manager() {
+        require_once plugin_dir_path(__FILE__) . 'admin-asset-manager.php';
+    }
+    
+    // Legacy function for backward compatibility
+    public function amigoPerf_newpage() {
+        $this->amigoPerf_core_settings(); // Redirect to core settings
+    }
+
+    function amigoPerf_reg_menu(){
+        add_action('admin_menu', array($this, 'amigoperformance_add_pages'));
+    }
+
+    // Working in Progress
+    function amigoPerf_admin_bar ( WP_Admin_Bar $admin_bar ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $admin_bar->add_menu( array(
+            'id'    => 'amigo-performance-main',
+            'parent' => null,
+            'group'  => null,
+            'title' => '<span class="ab-icon dashicons dashicons-buddicons-activity"></span>AmigoPerf',
+            'href'  => admin_url('admin.php?page=amigo_performance'),
+            'meta' => [
+                'title' => 'Amigo Performance', //This title will show on hover
+            ]
+        ) );
+        
+        // Add Asset Manager submenu
+        if ($this->asset_manager_enabled) {
+            $this->add_asset_manager_admin_bar_items($admin_bar);
+        }
+    }
+
+    public function amigoPerf_adminmenu(){
+        add_action( 'admin_bar_menu', array($this,'amigoPerf_admin_bar'), 500 );
+    }
+    // Working in Progress
+    
+    // Add-on System Methods
+    public function register_addon($addon_id, $addon_data) {
+        if (!isset($this->registered_addons[$addon_id])) {
+            $this->registered_addons[$addon_id] = array(
+                'name' => isset($addon_data['name']) ? $addon_data['name'] : $addon_id,
+                'version' => isset($addon_data['version']) ? $addon_data['version'] : '1.0',
+                'description' => isset($addon_data['description']) ? $addon_data['description'] : '',
+                'author' => isset($addon_data['author']) ? $addon_data['author'] : 'Amigo Dheena',
+                'file' => isset($addon_data['file']) ? $addon_data['file'] : '',
+                'class' => isset($addon_data['class']) ? $addon_data['class'] : '',
+                'requires_core' => isset($addon_data['requires_core']) ? $addon_data['requires_core'] : '2.7',
+                'license_key' => isset($addon_data['license_key']) ? $addon_data['license_key'] : '',
+                'is_premium' => isset($addon_data['is_premium']) ? $addon_data['is_premium'] : true
+            );
+            
+            // Check if core version is compatible
+            if (version_compare(AMIGOPERF_PLUGIN_VERSION, $this->registered_addons[$addon_id]['requires_core'], '>=')) {
+                $this->active_addons[$addon_id] = $this->registered_addons[$addon_id];
+                do_action('amigoperf_addon_activated', $addon_id, $this->registered_addons[$addon_id]);
+                return true;
+            } else {
+                add_action('admin_notices', function() use ($addon_id, $addon_data) {
+                    echo '<div class="notice notice-error"><p>';
+                    echo sprintf('Add-on "%s" requires Amigo Performance version %s or higher. Current version: %s', 
+                        $addon_data['name'], 
+                        $this->registered_addons[$addon_id]['requires_core'], 
+                        AMIGOPERF_PLUGIN_VERSION
+                    );
+                    echo '</p></div>';
+                });
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    public function get_registered_addons() {
+        return $this->registered_addons;
+    }
+    
+    public function get_active_addons() {
+        return $this->active_addons;
+    }
+    
+    public function is_addon_active($addon_id) {
+        return isset($this->active_addons[$addon_id]);
+    }
+    
+    public function validate_addon_license($addon_id, $license_key) {
+        // This method can be extended for license validation
+        // For now, we'll implement a basic structure
+        if (isset($this->registered_addons[$addon_id])) {
+            // You can implement your license validation logic here
+            // For example, API calls to your license server
+            return apply_filters('amigoperf_validate_addon_license', true, $addon_id, $license_key);
+        }
+        return false;
+    }
+    
+    // Add-on hooks for extensibility
+    public function addon_settings_tab($tabs) {
+        foreach ($this->active_addons as $addon_id => $addon_data) {
+            if (method_exists($addon_data['class'], 'get_settings_tab')) {
+                $addon_tabs = call_user_func(array($addon_data['class'], 'get_settings_tab'));
+                if (is_array($addon_tabs)) {
+                    $tabs = array_merge($tabs, $addon_tabs);
+                }
+            }
+        }
+        return $tabs;
+    }
+    
+    public function addon_settings_content($tab_id) {
+        foreach ($this->active_addons as $addon_id => $addon_data) {
+            if (method_exists($addon_data['class'], 'render_settings_tab')) {
+                call_user_func(array($addon_data['class'], 'render_settings_tab'), $tab_id);
+            }
+        }
+    }
+    // Add-on System Methods End
+    
+}
+
+if (class_exists('AmigoPerformancePlugin')) {
+    
+    $amigoperformanceplugin = new AmigoPerformancePlugin();
+    $amigoperformanceplugin -> amigoperformance_register();
+    $amigoPerfDefault = new AmigoPerformancePlugin();
+    $amigoPerfDefault -> amigoPerf_Default();
+    
+    // Make the main plugin instance globally accessible for add-ons
+    global $amigo_performance_instance;
+    $amigo_performance_instance = $amigoPerfDefault;
+    
+    // Hook form processing to admin_init for proper timing
+    add_action('admin_init', array($amigoPerfDefault, 'amigoperf_hiddenField'));
+    
+    $amigoPerfDefault -> amigoPerf_rqs_query('details');
+    $amigoPerfDefault -> amigoPerf_rqs_operation(); //Remove Query Strings Operation
+    $amigoPerfDefault -> amigoPerf_remoji_operation(); //Remove Emoji Operation
+    $amigoPerfDefault -> amigoPerf_defer_operation(); //Defer parsing of JavaScript
+    $amigoPerfDefault -> amigoPerf_iframelazy_execute(); //Iframe Lazyload  
+    $amigoPerfDefault -> amigoPerf_lazyload_execute(); //Image Lazyload  
+    $amigoPerfDefault -> amigoPerf_reg_menu(); //Register Menu
+    $amigoPerfDefault -> amigoPerf_update_checker(); //Update checker
+    $amigoPerfDefault -> amigoPerf_adminmenu(); //Admin Bar menu
+}
+
+// Activation
+register_activation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_activate'));
+
+// Deactivation
+register_deactivation_hook(__FILE__,array($amigoperformanceplugin,'amigoperformance_deactivate'));
+
+// Uninstall
+
+// Helper functions for add-ons
+if (!function_exists('amigoperf_register_addon')) {
+    function amigoperf_register_addon($addon_id, $addon_data) {
+        global $amigo_performance_instance;
+        if ($amigo_performance_instance && method_exists($amigo_performance_instance, 'register_addon')) {
+            return $amigo_performance_instance->register_addon($addon_id, $addon_data);
+        }
+        return false;
+    }
+}
+
+if (!function_exists('amigoperf_is_addon_active')) {
+    function amigoperf_is_addon_active($addon_id) {
+        global $amigo_performance_instance;
+        if ($amigo_performance_instance && method_exists($amigo_performance_instance, 'is_addon_active')) {
+            return $amigo_performance_instance->is_addon_active($addon_id);
+        }
+        return false;
+    }
+}
+
+if (!function_exists('amigoperf_get_active_addons')) {
+    function amigoperf_get_active_addons() {
+        global $amigo_performance_instance;
+        if ($amigo_performance_instance && method_exists($amigo_performance_instance, 'get_active_addons')) {
+            return $amigo_performance_instance->get_active_addons();
+        }
+        return array();
+    }
+}

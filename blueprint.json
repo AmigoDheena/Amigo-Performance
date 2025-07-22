@@ -1,0 +1,57 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "preferredVersions": {
+    "php": "8.1",
+    "wp": "latest"
+  },
+  "features": {
+    "networking": true
+  },
+  "siteOptions": {
+    "blogname": "Amigo Performance 3.1 Demo",
+    "blogdescription": "Demo site showcasing Amigo Performance 3.1 plugin features with enhanced security and performance"
+  },
+  "steps": [
+    {
+      "step": "login",
+      "username": "admin"
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins", 
+        "slug": "amigo-performance"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\n// Set default plugin options for demo\nupdate_option('amigoPerf_rqs', true);\nupdate_option('amigoPerf_remoji', true);\nupdate_option('amigoPerf_defer', true);\nupdate_option('amigoPerf_iframelazy', true);\nupdate_option('amigoPerf_lazyload', true);\necho 'Amigo Performance plugin configured with default settings';"
+    },
+    {
+      "step": "writeFile",
+      "path": "wp-content/themes/twentytwentyfour/functions.php",
+      "data": "<?php\n// Demo content for testing Amigo Performance features\nadd_action('wp_enqueue_scripts', function() {\n    // Enqueue some test scripts and styles\n    wp_enqueue_script('test-script-1', 'https://code.jquery.com/jquery-3.6.0.min.js', array(), '3.6.0', true);\n    wp_enqueue_script('test-script-2', 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js', array(), '4.17.21', true);\n    wp_enqueue_style('test-style-1', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css', array(), '6.0.0');\n    wp_enqueue_style('test-style-2', 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap', array(), '1.0.0');\n});\n\n// Add some test content with images for lazy loading demo\nadd_action('wp_footer', function() {\n    if (is_front_page()) {\n        echo '<div style=\"margin: 20px; padding: 20px; border: 1px solid #ddd;\">';\n        echo '<h3>Amigo Performance Plugin Demo</h3>';\n        echo '<p>This demo shows the plugin features in action:</p>';\n        echo '<ul>';\n        echo '<li>✅ Query strings removed from assets</li>';\n        echo '<li>✅ Emoji scripts disabled</li>';\n        echo '<li>✅ JavaScript deferred for better performance</li>';\n        echo '<li>✅ Images lazy loaded (scroll down to see)</li>';\n        echo '<li>✅ iFrames lazy loaded</li>';\n        echo '</ul>';\n        echo '<h4>Test Images (Lazy Loading):</h4>';\n        for ($i = 1; $i <= 5; $i++) {\n            echo '<img src=\"https://picsum.photos/400/300?random=' . $i . '\" alt=\"Test Image ' . $i . '\" style=\"display: block; margin: 10px 0; width: 400px; height: 300px;\" />';\n        }\n        echo '<h4>Test Video (iframe Lazy Loading):</h4>';\n        echo '<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\" allowfullscreen></iframe>';\n        echo '</div>';\n    }\n});"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp option update show_on_front page"
+    },
+    {
+      "step": "wp-cli", 
+      "command": "wp post create --post_type=page --post_status=publish --post_title='Demo Page' --post_content='<h2>Welcome to Amigo Performance Demo</h2><p>This page demonstrates the performance optimization features of the Amigo Performance plugin.</p><p>Check the browser developer tools to see:</p><ul><li>Scripts are deferred</li><li>Query strings are removed from CSS/JS files</li><li>Emoji scripts are not loaded</li><li>Images load lazily as you scroll</li></ul>'"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp option update page_on_front $(wp post list --post_type=page --post_status=publish --posts_per_page=1 --format=ids)"
+    }
+  ],
+  "landingPage": "/wp-admin/",
+  "meta": {
+    "title": "Amigo Performance 3.1 Plugin Demo",
+    "description": "Interactive demo of the Amigo Performance 3.1 WordPress plugin featuring modular architecture, enhanced security, advanced caching, and comprehensive performance optimizations.",
+    "author": "Amigo Dheena"
+  }
+}

@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Amigo Performance package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Amigo Performance 2.0\n"
+"Project-Id-Version: Amigo Performance 3.0\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
