@@ -2,7 +2,7 @@
 /**
  * @package amigo-performance
  * Core Settings Admin Page
- * Version: 2.7
+ * Version: 3.2
  */
 ?>
 
@@ -171,6 +171,68 @@
                                            name="<?php echo esc_attr($plugin_instance->amigoPerf_lazyload); ?>"
                                            value="1"
                                            <?php checked($plugin_instance->amigoPerf_lazyload_opt, true); ?>>
+                                    <span class="amigo-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Minify CSS Card -->
+                        <div class="amigo-card">
+                            <div class="amigo-card-header">
+                                <div class="amigo-card-icon css">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M4 4V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V8L16 4H5C4.44772 4 4 4.44772 4 4Z" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M14 4V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M9 12H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M9 16H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="amigo-card-title-area">
+                                    <h3 class="amigo-card-title">
+                                        <?php esc_html_e('Minify CSS', 'amigo-performance'); ?>
+                                        <span style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">NEW</span>
+                                    </h3>
+                                    <p class="amigo-card-desc"><?php esc_html_e('Compress CSS files by removing whitespace and comments', 'amigo-performance'); ?></p>
+                                </div>
+                            </div>
+                            <div class="amigo-card-control">
+                                <label class="amigo-toggle">
+                                    <input type="checkbox" 
+                                           name="<?php echo esc_attr($plugin_instance->amigoPerf_minify_css); ?>"
+                                           value="1"
+                                           <?php checked($plugin_instance->amigoPerf_minify_css_opt, true); ?>>
+                                    <span class="amigo-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Minify JavaScript Card -->
+                        <div class="amigo-card">
+                            <div class="amigo-card-header">
+                                <div class="amigo-card-icon javascript">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M4 4V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V8L16 4H5C4.44772 4 4 4.44772 4 4Z" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M14 4V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 15C12 14.2 11.5 13.5 10 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M10 17V13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M14 13.5V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M14 15.5C14 16.5 15 17 16 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="amigo-card-title-area">
+                                    <h3 class="amigo-card-title">
+                                        <?php esc_html_e('Minify JavaScript', 'amigo-performance'); ?>
+                                        <span style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">NEW</span>
+                                    </h3>
+                                    <p class="amigo-card-desc"><?php esc_html_e('Compress JavaScript files by removing whitespace and comments', 'amigo-performance'); ?></p>
+                                </div>
+                            </div>
+                            <div class="amigo-card-control">
+                                <label class="amigo-toggle">
+                                    <input type="checkbox" 
+                                           name="<?php echo esc_attr($plugin_instance->amigoPerf_minify_js); ?>"
+                                           value="1"
+                                           <?php checked($plugin_instance->amigoPerf_minify_js_opt, true); ?>>
                                     <span class="amigo-toggle-slider"></span>
                                 </label>
                             </div>

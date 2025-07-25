@@ -8,8 +8,8 @@
     "networking": true
   },
   "siteOptions": {
-    "blogname": "Amigo Performance 3.1 Demo",
-    "blogdescription": "Demo site showcasing Amigo Performance 3.1 plugin features with enhanced security and performance"
+    "blogname": "Amigo Performance 3.2 Demo",
+    "blogdescription": "Demo site showcasing Amigo Performance 3.2 plugin features with enhanced security and performance"
   },
   "steps": [
     {
@@ -50,8 +50,8 @@
   ],
   "landingPage": "/wp-admin/",
   "meta": {
-    "title": "Amigo Performance 3.1 Plugin Demo",
-    "description": "Interactive demo of the Amigo Performance 3.1 WordPress plugin featuring modular architecture, enhanced security, advanced caching, and comprehensive performance optimizations.",
+    "title": "Amigo Performance 3.2 Plugin Demo",
+    "description": "Interactive demo of the Amigo Performance 3.2 WordPress plugin featuring modular architecture, enhanced security, advanced caching, and comprehensive performance optimizations.",
     "author": "Amigo Dheena"
   }
 }

@@ -3,7 +3,7 @@
  * Plugin Name:       Amigo Performance
  * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
  * Description:       A lightweight performance optimization plugin that boosts website speed by removing query strings, disabling emojis, enabling script defer, and implementing lazy loading for images and iframes to improve scores in Google PageSpeed Insights and GTmetrix.
- * Version:           3.1
+ * Version:           3.2
  * Author:            Amigo Dheena
  * Author URI:        https://github.com/AmigoDheena
  * Text Domain:       amigo-performance
@@ -29,7 +29,7 @@ include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
 // Define plugin constants
 if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
-    define('AMIGOPERF_PLUGIN_VERSION', '3.1');
+    define('AMIGOPERF_PLUGIN_VERSION', '3.2');
 }
 
 if (!defined('AMIGOPERF_PLUGIN_PATH')) {
@@ -68,6 +68,7 @@ add_action('plugins_loaded', 'amigoperf_load_textdomain', 1);
 require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-logger.php';
 require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-core.php';
 require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-lazyload.php';
+require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-minify.php';
 require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-asset-manager.php';
 require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-admin.php';
 require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-settings.php';
@@ -99,10 +100,17 @@ class AmigoPerformancePlugin {
     public $amigoPerf_lazyload;
     public $amigoPerf_lazyload_opt;
     public $amigoPerf_lazyload_val;
+    public $amigoPerf_minify_css;
+    public $amigoPerf_minify_css_opt;
+    public $amigoPerf_minify_css_val;
+    public $amigoPerf_minify_js;
+    public $amigoPerf_minify_js_opt;
+    public $amigoPerf_minify_js_val;
     
     // Component instances
     private $core;
     private $lazyload;
+    private $minify;
     private $asset_manager;
     private $admin;
     private $settings;
@@ -125,6 +133,7 @@ class AmigoPerformancePlugin {
     private function init_components() {
         $this->core = new AmigoPerformance_Core($this);
         $this->lazyload = new AmigoPerformance_LazyLoad($this);
+        $this->minify = new AmigoPerformance_Minify($this);
         $this->asset_manager = new AmigoPerformance_AssetManager($this);
         $this->admin = new AmigoPerformance_Admin($this);
         $this->settings = new AmigoPerformance_Settings($this);
@@ -161,6 +170,7 @@ class AmigoPerformancePlugin {
         $this->core->execute_defer_javascript();
         $this->lazyload->init_image_lazy_loading();
         $this->lazyload->init_iframe_lazy_loading();
+        $this->minify->init();
     }
     
     /**

@@ -3,7 +3,7 @@
  * Settings Management
  * 
  * @package amigo-performance
- * @version 3.0
+ * @version 3.2
  */
 
 if (!defined('ABSPATH')) {
@@ -62,6 +62,16 @@ class AmigoPerformance_Settings {
         $this->plugin_instance->amigoPerf_lazyload = 'amigoPerf_lazyload';
         $this->plugin_instance->amigoPerf_lazyload_opt = get_option($this->plugin_instance->amigoPerf_lazyload, true);
         $this->plugin_instance->amigoPerf_lazyload_val = $this->plugin_instance->amigoPerf_lazyload_opt;
+
+        // Minify CSS (Premium)
+        $this->plugin_instance->amigoPerf_minify_css = 'amigoPerf_minify_css';
+        $this->plugin_instance->amigoPerf_minify_css_opt = get_option($this->plugin_instance->amigoPerf_minify_css, false);
+        $this->plugin_instance->amigoPerf_minify_css_val = $this->plugin_instance->amigoPerf_minify_css_opt;
+
+        // Minify JavaScript (Premium)
+        $this->plugin_instance->amigoPerf_minify_js = 'amigoPerf_minify_js';
+        $this->plugin_instance->amigoPerf_minify_js_opt = get_option($this->plugin_instance->amigoPerf_minify_js, false);
+        $this->plugin_instance->amigoPerf_minify_js_val = $this->plugin_instance->amigoPerf_minify_js_opt;
     }
     
     /**
@@ -85,6 +95,8 @@ class AmigoPerformance_Settings {
         $this->process_setting('amigoPerf_defer');
         $this->process_setting('amigoPerf_iframelazy');
         $this->process_setting('amigoPerf_lazyload');
+        $this->process_setting('amigoPerf_minify_css');
+        $this->process_setting('amigoPerf_minify_js');
 
         flush_rewrite_rules();
     }

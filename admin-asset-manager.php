@@ -2,7 +2,7 @@
 /**
  * @package amigo-performance
  * Asset Manager Admin Page
- * Version: 2.7
+ * Version: 3.2
  */
 ?>
 
@@ -204,64 +204,125 @@
                     </div>
                 <?php else: ?>
 
-                    <!-- Asset Management Table -->
+                    <!-- Asset Management by Page -->
                     <div class="amigo-card">
                         <div class="amigo-card-header">
-                            <h3 class="amigo-card-title"><?php esc_html_e('Managed Assets', 'amigo-performance'); ?></h3>
-                            <p class="amigo-card-desc"><?php esc_html_e('View and manage all assets that have been controlled through the admin bar.', 'amigo-performance'); ?></p>
+                            <h3 class="amigo-card-title"><?php esc_html_e('Managed Assets by Page', 'amigo-performance'); ?></h3>
+                            <p class="amigo-card-desc"><?php esc_html_e('Assets are organized by page. Click on any page to view and manage its assets.', 'amigo-performance'); ?></p>
                         </div>
                         
-                        <div class="amigo-table-container">
-                            <table class="amigo-assets-table">
-                                <thead>
-                                    <tr>
-                                        <th><?php esc_html_e('Page URL', 'amigo-performance'); ?></th>
-                                        <th><?php esc_html_e('Asset Handle', 'amigo-performance'); ?></th>
-                                        <th><?php esc_html_e('Type', 'amigo-performance'); ?></th>
-                                        <th><?php esc_html_e('Status', 'amigo-performance'); ?></th>
-                                        <th><?php esc_html_e('Actions', 'amigo-performance'); ?></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($all_assets as $asset): ?>
-                                        <tr>
-                                            <td>
-                                                <a href="<?php echo esc_url($asset->page_url); ?>" target="_blank" class="amigo-page-link" title="<?php esc_attr_e('Open in new tab', 'amigo-performance'); ?>">
-                                                    <?php echo esc_html(amigoperf_truncate_url($asset->page_url, 50)); ?>
+                        <div class="amigo-accordion-container">
+                            <?php 
+                            // Group assets by page URL
+                            $assets_by_page = array();
+                            foreach ($all_assets as $asset) {
+                                $assets_by_page[$asset->page_url][] = $asset;
+                            }
+                            
+                            $page_index = 0;
+                            foreach ($assets_by_page as $page_url => $page_assets):
+                                $page_index++;
+                                $disabled_count = count(array_filter($page_assets, function($asset) { return $asset->is_dequeued; }));
+                                $enabled_count = count($page_assets) - $disabled_count;
+                                $css_count = count(array_filter($page_assets, function($asset) { return $asset->asset_type === 'css'; }));
+                                $js_count = count(array_filter($page_assets, function($asset) { return $asset->asset_type === 'js'; }));
+                            ?>
+                            
+                            <div class="amigo-accordion-item">
+                                <div class="amigo-accordion-header" onclick="toggleAccordion(<?php echo esc_attr($page_index); ?>)">
+                                    <div class="amigo-page-info">
+                                        <div class="amigo-page-url">
+                                            <span class="amigo-folder-icon">📁</span>
+                                            <strong><?php echo esc_html(amigoperf_truncate_url($page_url, 60)); ?></strong>
+                                            <a href="<?php echo esc_url($page_url); ?>" target="_blank" class="amigo-external-link" title="<?php esc_attr_e('Open page in new tab', 'amigo-performance'); ?>" onclick="event.stopPropagation();">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M18 13V19C18 19.5523 17.5523 20 17 20H5C4.44772 20 4 19.5523 4 19V7C4 6.44772 4.44772 6 5 6H11" stroke="currentColor" stroke-width="2"/>
+                                                    <path d="M15 3H21V9" stroke="currentColor" stroke-width="2"/>
+                                                    <path d="M10 14L21 3" stroke="currentColor" stroke-width="2"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                        <div class="amigo-page-summary">
+                                            <span class="amigo-asset-count"><?php echo esc_html($css_count); ?> CSS</span>
+                                            <span class="amigo-asset-count"><?php echo esc_html($js_count); ?> JS</span>
+                                            <span class="amigo-disabled-count"><?php echo esc_html($disabled_count); ?> disabled</span>
+                                            
+                                            <div class="amigo-bulk-actions" onclick="event.stopPropagation();">
+                                                <button class="amigo-btn amigo-btn-tiny amigo-btn-success" onclick="bulkToggleAssets(<?php echo esc_attr($page_index); ?>, false)" title="<?php esc_attr_e('Enable all assets on this page', 'amigo-performance'); ?>">
                                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M18 13V19C18 19.5523 17.5523 20 17 20H5C4.44772 20 4 19.5523 4 19V7C4 6.44772 4.44772 6 5 6H11" stroke="currentColor" stroke-width="2"/>
-                                                        <path d="M15 3H21V9" stroke="currentColor" stroke-width="2"/>
-                                                        <path d="M10 14L21 3" stroke="currentColor" stroke-width="2"/>
+                                                        <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2"/>
+                                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
                                                     </svg>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <strong><?php echo esc_html($asset->asset_handle); ?></strong>
-                                            </td>
-                                            <td>
-                                                <span class="amigo-asset-type-badge amigo-asset-type-<?php echo esc_attr($asset->asset_type); ?>">
-                                                    <?php echo esc_html(strtoupper($asset->asset_type)); ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="amigo-status-badge <?php echo $asset->is_dequeued ? 'disabled' : 'enabled'; ?>">
+                                                    <?php esc_html_e('Enable All', 'amigo-performance'); ?>
+                                                </button>
+                                                <button class="amigo-btn amigo-btn-tiny amigo-btn-warning" onclick="bulkToggleAssets(<?php echo esc_attr($page_index); ?>, true)" title="<?php esc_attr_e('Disable all assets on this page', 'amigo-performance'); ?>">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                                        <path d="M15 9L9 15" stroke="currentColor" stroke-width="2"/>
+                                                        <path d="M9 9L15 15" stroke="currentColor" stroke-width="2"/>
+                                                    </svg>
+                                                    <?php esc_html_e('Disable All', 'amigo-performance'); ?>
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="amigo-accordion-arrow">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <div class="amigo-accordion-content" id="accordion-<?php echo esc_attr($page_index); ?>">
+                                    <div class="amigo-assets-grid">
+                                        <?php foreach ($page_assets as $asset): ?>
+                                        <div class="amigo-asset-card <?php echo $asset->is_dequeued ? 'disabled' : 'enabled'; ?>">
+                                            <div class="amigo-asset-info">
+                                                <div class="amigo-asset-header">
+                                                    <span class="amigo-asset-type-badge amigo-asset-type-<?php echo esc_attr($asset->asset_type); ?>">
+                                                        <?php echo esc_html(strtoupper($asset->asset_type)); ?>
+                                                    </span>
+                                                    <span class="amigo-status-indicator <?php echo $asset->is_dequeued ? 'disabled' : 'enabled'; ?>">
+                                                        <?php if ($asset->is_dequeued): ?>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2"/>
+                                                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2"/>
+                                                            </svg>
+                                                        <?php else: ?>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2"/>
+                                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                                            </svg>
+                                                        <?php endif; ?>
+                                                    </span>
+                                                </div>
+                                                <div class="amigo-asset-name">
+                                                    <strong><?php echo esc_html($asset->asset_handle); ?></strong>
+                                                </div>
+                                                <div class="amigo-asset-status">
                                                     <?php echo $asset->is_dequeued ? esc_html__('Disabled', 'amigo-performance') : esc_html__('Enabled', 'amigo-performance'); ?>
-                                                </span>
-                                            </td>
-                                            <td>
+                                                </div>
+                                            </div>
+                                            <div class="amigo-asset-actions">
                                                 <button class="amigo-btn amigo-btn-small amigo-btn-secondary" onclick="toggleAssetStatus(<?php echo esc_attr($asset->id); ?>, <?php echo $asset->is_dequeued ? 'false' : 'true'; ?>)">
                                                     <?php echo $asset->is_dequeued ? esc_html__('Enable', 'amigo-performance') : esc_html__('Disable', 'amigo-performance'); ?>
                                                 </button>
                                                 <button class="amigo-btn amigo-btn-small amigo-btn-danger" onclick="deleteAsset(<?php echo esc_attr($asset->id); ?>)">
                                                     <?php esc_html_e('Delete', 'amigo-performance'); ?>
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <?php endforeach; ?>
                         </div>
                     </div>
+
                 <?php endif; ?>
             </div>
         </div>

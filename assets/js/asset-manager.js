@@ -3,6 +3,189 @@
  * Handles toggling and deletion of assets via AJAX
  */
 
+// Accordion functionality
+function toggleAccordion(index) {
+    const content = document.getElementById('accordion-' + index);
+    const header = content.previousElementSibling;
+    const arrow = header.querySelector('.amigo-accordion-arrow svg');
+    
+    if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+        content.classList.remove('active');
+        header.classList.remove('active');
+        arrow.style.transform = 'rotate(0deg)';
+    } else {
+        // Close all other accordions first
+        document.querySelectorAll('.amigo-accordion-content').forEach(item => {
+            item.style.maxHeight = null;
+            item.classList.remove('active');
+            item.previousElementSibling.classList.remove('active');
+            item.previousElementSibling.querySelector('.amigo-accordion-arrow svg').style.transform = 'rotate(0deg)';
+        });
+        
+        // Open clicked accordion
+        content.style.maxHeight = content.scrollHeight + "px";
+        content.classList.add('active');
+        header.classList.add('active');
+        arrow.style.transform = 'rotate(180deg)';
+    }
+}
+
+// Bulk toggle all assets in a page
+function bulkToggleAssets(accordionIndex, disable) {
+    const accordionContent = document.getElementById('accordion-' + accordionIndex);
+    const assetCards = accordionContent.querySelectorAll('.amigo-asset-card');
+    
+    if (assetCards.length === 0) {
+        showNotice('warning', 'No assets found in this page.');
+        return;
+    }
+    
+    // Get the button that was clicked for loading state
+    const clickedButton = event.target.closest('button');
+    const originalText = clickedButton.textContent.trim();
+    clickedButton.disabled = true;
+    clickedButton.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-dasharray="20" stroke-dashoffset="20"><animate attributeName="stroke-dashoffset" dur="1s" values="20;0" repeatCount="indefinite"/></circle></svg> Processing...`;
+    
+    // Collect all asset IDs that need to be toggled
+    const assetsToToggle = [];
+    assetCards.forEach(card => {
+        const isCurrentlyDisabled = card.classList.contains('disabled');
+        // Only toggle if the current state is different from what we want
+        if (disable && !isCurrentlyDisabled) {
+            // We want to disable, and it's currently enabled
+            const toggleButton = card.querySelector('.amigo-btn-secondary');
+            if (toggleButton) {
+                const onclickAttr = toggleButton.getAttribute('onclick');
+                const assetIdMatch = onclickAttr.match(/toggleAssetStatus\((\d+),/);
+                if (assetIdMatch) {
+                    assetsToToggle.push({
+                        id: parseInt(assetIdMatch[1]),
+                        card: card,
+                        disable: true
+                    });
+                }
+            }
+        } else if (!disable && isCurrentlyDisabled) {
+            // We want to enable, and it's currently disabled
+            const toggleButton = card.querySelector('.amigo-btn-secondary');
+            if (toggleButton) {
+                const onclickAttr = toggleButton.getAttribute('onclick');
+                const assetIdMatch = onclickAttr.match(/toggleAssetStatus\((\d+),/);
+                if (assetIdMatch) {
+                    assetsToToggle.push({
+                        id: parseInt(assetIdMatch[1]),
+                        card: card,
+                        disable: false
+                    });
+                }
+            }
+        }
+    });
+    
+    if (assetsToToggle.length === 0) {
+        clickedButton.disabled = false;
+        clickedButton.innerHTML = originalText;
+        const action = disable ? 'disabled' : 'enabled';
+        showNotice('info', `All assets are already ${action} on this page.`);
+        return;
+    }
+    
+    // Process assets in batches to avoid overwhelming the server
+    let completed = 0;
+    let errors = 0;
+    
+    const processAsset = (assetData) => {
+        return new Promise((resolve) => {
+            const formData = new FormData();
+            formData.append('action', 'amigoperf_asset_admin_toggle');
+            formData.append('asset_id', assetData.id);
+            formData.append('disable', assetData.disable ? '1' : '0');
+            formData.append('nonce', amigoAssetManager.nonce);
+            
+            fetch(amigoAssetManager.ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the asset card UI
+                    const card = assetData.card;
+                    const statusIndicator = card.querySelector('.amigo-status-indicator');
+                    const statusText = card.querySelector('.amigo-asset-status');
+                    const toggleButton = card.querySelector('.amigo-btn-secondary');
+                    
+                    if (assetData.disable) {
+                        // Disabling the asset
+                        card.classList.remove('enabled');
+                        card.classList.add('disabled');
+                        statusIndicator.classList.remove('enabled');
+                        statusIndicator.classList.add('disabled');
+                        statusText.textContent = 'Disabled';
+                        toggleButton.textContent = 'Enable';
+                        toggleButton.setAttribute('onclick', `toggleAssetStatus(${assetData.id}, false, event)`);
+                        
+                        statusIndicator.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2"/>
+                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        `;
+                    } else {
+                        // Enabling the asset
+                        card.classList.remove('disabled');
+                        card.classList.add('enabled');
+                        statusIndicator.classList.remove('disabled');
+                        statusIndicator.classList.add('enabled');
+                        statusText.textContent = 'Enabled';
+                        toggleButton.textContent = 'Disable';
+                        toggleButton.setAttribute('onclick', `toggleAssetStatus(${assetData.id}, true, event)`);
+                        
+                        statusIndicator.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        `;
+                    }
+                    completed++;
+                } else {
+                    errors++;
+                }
+                resolve();
+            })
+            .catch(() => {
+                errors++;
+                resolve();
+            });
+        });
+    };
+    
+    // Process all assets
+    Promise.all(assetsToToggle.map(processAsset)).then(() => {
+        // Restore button state
+        clickedButton.disabled = false;
+        clickedButton.innerHTML = originalText;
+        
+        // Update accordion summary
+        updateAccordionSummary(assetCards[0]);
+        
+        // Update global stats
+        updateStatsCount();
+        
+        // Show result message
+        if (errors === 0) {
+            const action = disable ? 'disabled' : 'enabled';
+            showNotice('success', `Successfully ${action} ${completed} assets on this page.`);
+        } else {
+            showNotice('warning', `Completed with ${completed} successful and ${errors} failed operations.`);
+        }
+    });
+}
+
 function toggleAssetStatus(assetId, disable, e) {
     // Get the event object
     const evt = e || window.event;
@@ -27,42 +210,62 @@ function toggleAssetStatus(assetId, disable, e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Update button text and status badge
-            const row = button.closest('tr');
-            const statusBadge = row.querySelector('.amigo-status-badge');
+            // Update button text and status badge for accordion structure
+            const assetCard = button.closest('.amigo-asset-card');
+            const statusIndicator = assetCard.querySelector('.amigo-status-indicator');
+            const statusText = assetCard.querySelector('.amigo-asset-status');
             
             // Check the current state to determine if we need to increment or decrement
-            const wasDisabled = statusBadge.classList.contains('disabled');
+            const wasDisabled = assetCard.classList.contains('disabled');
             
             if (disable) {
                 // We are disabling the asset
                 button.textContent = 'Enable';
-                // Remove the old onclick handler and add a new one
-                button.removeAttribute('onclick');
-                button.onclick = function(e) {
-                    toggleAssetStatus(assetId, false, e);
-                    return false; // Prevent default
-                };
-                statusBadge.textContent = 'Disabled';
-                statusBadge.className = 'amigo-status-badge disabled';
+                button.setAttribute('onclick', `toggleAssetStatus(${assetId}, false, event)`);
+                statusText.textContent = 'Disabled';
+                statusIndicator.classList.remove('enabled');
+                statusIndicator.classList.add('disabled');
+                assetCard.classList.remove('enabled');
+                assetCard.classList.add('disabled');
                 
-                // Update disabled count only if it wasn't already disabled
+                // Update status indicator icon
+                statusIndicator.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M15 9L9 15" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9 9L15 15" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                `;
+                
+                // Update accordion header summary
+                updateAccordionSummary(assetCard);
+                
+                // Update global stats
                 if (!wasDisabled) {
                     updateDisabledCount(1);
                 }
             } else {
                 // We are enabling the asset
                 button.textContent = 'Disable';
-                // Remove the old onclick handler and add a new one
-                button.removeAttribute('onclick');
-                button.onclick = function(e) {
-                    toggleAssetStatus(assetId, true, e);
-                    return false; // Prevent default
-                };
-                statusBadge.textContent = 'Enabled';
-                statusBadge.className = 'amigo-status-badge enabled';
+                button.setAttribute('onclick', `toggleAssetStatus(${assetId}, true, event)`);
+                statusText.textContent = 'Enabled';
+                statusIndicator.classList.remove('disabled');
+                statusIndicator.classList.add('enabled');
+                assetCard.classList.remove('disabled');
+                assetCard.classList.add('enabled');
                 
-                // Update disabled count only if it was previously disabled
+                // Update status indicator icon
+                statusIndicator.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                `;
+                
+                // Update accordion header summary
+                updateAccordionSummary(assetCard);
+                
+                // Update global stats
                 if (wasDisabled) {
                     updateDisabledCount(-1);
                 }
@@ -108,24 +311,40 @@ function deleteAsset(assetId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Remove the row from the table
-                const row = button.closest('tr');
-                row.style.backgroundColor = '#ffdbdb';
+                // Remove the card from the accordion
+                const assetCard = button.closest('.amigo-asset-card');
+                const accordionContent = assetCard.closest('.amigo-accordion-content');
+                const accordionItem = accordionContent.closest('.amigo-accordion-item');
                 
-                // Check if this is the last row in the table (excluding the header row)
-                const tableBody = row.closest('tbody');
-                const remainingRows = tableBody ? tableBody.querySelectorAll('tr').length : 0;
+                assetCard.style.backgroundColor = '#ffdbdb';
+                
+                // Check if this is the last asset in the accordion
+                const remainingCards = accordionContent.querySelectorAll('.amigo-asset-card').length;
                 
                 setTimeout(() => {
-                    row.style.opacity = 0;
+                    assetCard.style.opacity = 0;
                     setTimeout(() => {
-                        row.remove();
+                        assetCard.remove();
                         
-                        // Update stats count
+                        // Update accordion height
+                        if (accordionContent.classList.contains('active')) {
+                            accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+                        }
+                        
+                        // If that was the last asset in this accordion, remove the whole accordion item
+                        if (remainingCards <= 1) {
+                            accordionItem.remove();
+                        } else {
+                            // Update accordion summary
+                            updateAccordionHeaderAfterDelete(accordionItem);
+                        }
+                        
+                        // Update global stats
                         updateStatsCount();
                         
-                        // If that was the last row, check directly if we need to show empty state
-                        if (remainingRows <= 1) {
+                        // Check if this was the last asset overall
+                        const totalAccordionItems = document.querySelectorAll('.amigo-accordion-item').length;
+                        if (totalAccordionItems === 0) {
                             showEmptyState();
                         }
                     }, 400);
@@ -145,6 +364,37 @@ function deleteAsset(assetId) {
             showNotice('error', 'An error occurred while processing your request.');
         });
     }
+}
+
+// Helper function to update accordion summary when asset status changes
+function updateAccordionSummary(assetCard, disabledCountChange, wasDisabled) {
+    const accordionItem = assetCard.closest('.amigo-accordion-item');
+    const header = accordionItem.querySelector('.amigo-accordion-header');
+    const disabledCountElement = header.querySelector('.amigo-disabled-count');
+    
+    if (disabledCountElement) {
+        // Recount all disabled assets in this accordion instead of relying on incremental changes
+        const accordionContent = accordionItem.querySelector('.amigo-accordion-content');
+        const disabledAssets = accordionContent.querySelectorAll('.amigo-asset-card.disabled').length;
+        disabledCountElement.textContent = `${disabledAssets} disabled`;
+    }
+}
+
+// Helper function to update accordion header after asset deletion
+function updateAccordionHeaderAfterDelete(accordionItem) {
+    const accordionContent = accordionItem.querySelector('.amigo-accordion-content');
+    const header = accordionItem.querySelector('.amigo-accordion-header');
+    const summaryElements = header.querySelectorAll('.amigo-asset-count, .amigo-disabled-count');
+    
+    // Recount assets in this accordion
+    const cssAssets = accordionContent.querySelectorAll('.amigo-asset-type-css').length;
+    const jsAssets = accordionContent.querySelectorAll('.amigo-asset-type-js').length;
+    const disabledAssets = accordionContent.querySelectorAll('.amigo-asset-card.disabled').length;
+    
+    // Update the summary
+    summaryElements[0].textContent = `${cssAssets} CSS`;
+    summaryElements[1].textContent = `${jsAssets} JS`;
+    summaryElements[2].textContent = `${disabledAssets} disabled`;
 }
 
 // Helper function to show admin notices
@@ -186,14 +436,16 @@ function updateStatsCount() {
     const cssAssetsElement = document.querySelector('.amigo-stat-card:nth-child(4) .amigo-stat-number');
     const jsAssetsElement = document.querySelector('.amigo-stat-card:nth-child(5) .amigo-stat-number');
     
+    // Count current assets in accordion structure
+    const allAssetCards = document.querySelectorAll('.amigo-asset-card');
+    const totalAssets = allAssetCards.length;
+    
     // Update total assets count
     if (totalAssetsElement) {
-        const currentTotal = parseInt(totalAssetsElement.textContent, 10);
-        const newTotal = currentTotal - 1;
-        totalAssetsElement.textContent = newTotal.toString();
+        totalAssetsElement.textContent = totalAssets.toString();
         
         // Check if this was the last asset
-        if (newTotal === 0) {
+        if (totalAssets === 0) {
             // Show empty state after a small delay to allow animation to finish
             setTimeout(() => {
                 showEmptyState();
@@ -210,18 +462,15 @@ function updateStatsCount() {
     }
     
     // Count current disabled assets
-    const disabledBadges = document.querySelectorAll('.amigo-status-badge.disabled');
+    const disabledCards = document.querySelectorAll('.amigo-asset-card.disabled');
     if (disabledAssetsElement) {
-        disabledAssetsElement.textContent = disabledBadges.length.toString();
+        disabledAssetsElement.textContent = disabledCards.length.toString();
     }
     
     // Calculate unique pages after deletion
     if (uniquePagesElement) {
-        const uniqueUrls = new Set();
-        document.querySelectorAll('.amigo-page-link').forEach(link => {
-            uniqueUrls.add(link.getAttribute('href'));
-        });
-        uniquePagesElement.textContent = uniqueUrls.size.toString();
+        const uniqueAccordions = document.querySelectorAll('.amigo-accordion-item');
+        uniquePagesElement.textContent = uniqueAccordions.length.toString();
     }
     
     // Count assets by type
@@ -286,13 +535,17 @@ function updateTotalCount(change) {
 
 // Helper function to show empty state
 function showEmptyState() {
-    // Get the asset table card
-    const assetTableCard = document.querySelector('.amigo-card');
-    if (!assetTableCard) return;
+    // Get the accordion container
+    const accordionContainer = document.querySelector('.amigo-accordion-container');
+    if (!accordionContainer) return;
     
     // Check if empty state already exists
     const existingEmptyState = document.querySelector('.amigo-empty-state');
     if (existingEmptyState) return; // Don't add it twice
+    
+    // Get the parent card
+    const assetCard = accordionContainer.closest('.amigo-card');
+    if (!assetCard) return;
     
     // Create the empty state HTML
     const emptyStateHTML = `
@@ -314,8 +567,13 @@ function showEmptyState() {
             ${amigoAssetManager.i18n.visitHomepage}
         </a>
     </div>
+    `;
     
-    <!-- How to Use Section -->
+    // Replace the accordion container with empty state
+    accordionContainer.outerHTML = emptyStateHTML;
+    
+    // Add the How to Use section after the empty state
+    const howToUseHTML = `
     <div class="amigo-card">
         <div class="amigo-card-header">
             <h3 class="amigo-card-title">${amigoAssetManager.i18n.howToUse}</h3>
@@ -358,13 +616,6 @@ function showEmptyState() {
     </div>
     `;
     
-    // Replace the asset table with the empty state
-    const amigoSection = document.querySelector('.amigo-section');
-    if (amigoSection) {
-        // Remove the asset table card
-        assetTableCard.remove();
-        
-        // Append the empty state HTML
-        amigoSection.insertAdjacentHTML('beforeend', emptyStateHTML);
-    }
+    // Insert the How to Use section after the current card
+    assetCard.insertAdjacentHTML('afterend', howToUseHTML);
 }

@@ -3,7 +3,7 @@
  * Lazy Loading Implementation
  * 
  * @package amigo-performance
- * @version 3.0
+ * @version 3.2
  */
 
 if (!defined('ABSPATH')) {

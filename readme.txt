@@ -3,7 +3,7 @@ Contributors: AmigoDheena
 Tags: performance, optimization, page speed, caching, lazy loading
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 3.1
+Stable tag: 3.2
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -14,35 +14,11 @@ Boost your website speed and improve Core Web Vitals scores with this comprehens
 
 **Amigo Performance** is a powerful yet lightweight WordPress optimization plugin designed to significantly improve your website's loading speed and performance scores. Whether you're a developer, agency, or website owner, this plugin provides essential tools to enhance your site's Core Web Vitals and user experience.
 
-### 🚀 What's New in Version 3.0
-
-**🎯 Revolutionary Asset Manager - Site-Wide Control:** The game-changing new Asset Manager gives you complete control over which CSS/JS files load on EVERY page of your website. Unlike the previous version that only managed the homepage, you can now optimize your entire site with surgical precision.
-
-**🛠️ No-Code Optimization Made Simple:** Remove unnecessary assets from any page without touching a single line of code. If something breaks, restore it instantly with one click. This tool puts developer-level optimization power into a user-friendly interface that anyone can master.
-
-**🚀 Complete Plugin Architecture Redesign:** Built from the ground up with modular architecture, enhanced security, advanced caching, and WordPress coding standards compliance. The plugin now uses a class-based structure with 6 specialized components for maximum performance and reliability.
-
-**🔧 Enhanced Security & Performance:** Complete security hardening with proper nonce verification, input sanitization, and comprehensive caching system. All functionality has been optimized for better performance and reliability.
-
-**📊 Fixed WordPress.org Statistics:** Resolved version tracking issues that were showing incorrect statistics. The plugin now properly reports version 3.0 and accurate installation counts.
-
-### 🎨 Previous Updates in Version 2.7
-
-**Performance Enhancements:** Significant performance improvements in the core functionality, better handling of iframe lazy loading, and enhanced compatibility with WordPress 6.9.
-
-**Advanced iframe lazy loading:** Improved iframe lazy loading with better handling of various iframe types and enhanced error handling.
-
-### 🎨 Previous Updates in Version 2.5
-
-**Modern Professional Interface:** Complete redesign with a sleek, modern admin panel that follows WordPress design standards. The new interface features intuitive tabbed navigation, professional color schemes, and enhanced user experience.
-
-**Enhanced Security Framework:** Comprehensive security improvements with proper nonce validation, user capability checks, and input sanitization to ensure your website remains secure.
-
-**Improved Performance:** Better code optimization, enhanced lazy loading algorithms, and improved compatibility with popular themes and plugins.
-
 ### 🚀 Key Features
 
-**🎯 Advanced Asset Manager (NEW in v3.0):**
+**🎯 Advanced Asset Manager (NEW in v3.2):**
+* **Page-wise Asset Grouping** - Assets organized by page URL in an accordion interface for easy management
+* **Compact View Design** - Handle large numbers of assets efficiently with streamlined UI
 * **Site-Wide Asset Control** - Manage CSS/JS files on every page, not just the homepage
 * **Visual Asset Discovery** - See all loaded assets with real-time detection on any page
 * **One-Click Optimization** - Remove unnecessary files instantly without coding
@@ -50,6 +26,10 @@ Boost your website speed and improve Core Web Vitals scores with this comprehens
 * **Per-Page Precision** - Different optimization settings for different pages
 * **Developer-Level Power** - Professional optimization tools with beginner-friendly interface
 * **Asset Statistics** - Track performance improvements and asset usage across your site
+
+**✨ Minification Features (NEW in v3.2):**
+* **CSS Minification** - Compress CSS files by removing whitespace, comments, and unnecessary characters
+* **JavaScript Minification** - Optimize JavaScript files for faster loading and execution
 
 **Core Performance Optimizations:**
 * **Remove Query Strings** - Eliminate version parameters from CSS/JS files for better caching
@@ -75,23 +55,43 @@ Boost your website speed and improve Core Web Vitals scores with this comprehens
 
 ### 🛠️ Feature Details
 
-**🎯 Revolutionary Asset Manager (v3.0 Flagship Feature)**
-The Advanced Asset Manager is a complete game-changer for WordPress performance optimization. Unlike traditional methods that require coding knowledge or only work on the homepage, this tool gives you granular control over every CSS and JavaScript file across your entire website.
+**🎯 Revolutionary Asset Manager (Updated in v3.2)**
+The Advanced Asset Manager is now even better with page-wise asset grouping in a convenient accordion interface. This major UI improvement makes it much easier to manage large numbers of assets across your entire website.
 
 **How It Works:**
 - Visit any page on your website while logged in as admin
 - Click the "Asset Manager" button in the admin bar
-- See all CSS/JS files currently loading on that specific page
+- See all CSS/JS files organized by page URL in an accordion interface
+- Expand/collapse page sections to focus on specific areas of your site
 - Toggle files on/off with simple switches
 - Changes apply instantly - test immediately
 - If something breaks, restore it with one click
 
 **Key Advantages:**
+- **Page-wise Organization:** Assets are grouped by URL for easier management
+- **Compact Interface:** Efficiently handle large numbers of resources
 - **Site-Wide Control:** Unlike the old system (homepage only), manage assets on every page
 - **Visual Interface:** See exactly which files are loading in real-time
 - **Safe Testing:** All changes are reversible instantly
 - **No Coding Required:** Point, click, optimize - that's it!
 - **Professional Results:** Achieve developer-level optimization without technical knowledge
+
+**✨ CSS & JS Minification (NEW Features)**
+The new minification features help reduce file sizes by removing unnecessary characters, whitespace, and comments from your CSS and JavaScript files.
+
+**How Minification Works:**
+- Enable CSS and/or JS minification in the core settings
+- The plugin automatically processes files to reduce their size
+- Minified versions are cached for optimal performance
+- Original files remain untouched for safety
+- File size reductions of 20-40% are common
+
+**Key Benefits:**
+- **Smaller File Sizes:** Reduces download time and bandwidth usage
+- **Faster Page Loading:** Smaller files load and execute more quickly
+- **Improved Performance Scores:** Better PageSpeed and Core Web Vitals metrics
+- **No Visual Changes:** Functionality and appearance remain identical
+- **Smart Caching:** Minified files are cached for optimal performance
 
 **1. Query String Removal**
 Removes version parameters (e.g., `?ver=4.6`) from CSS and JavaScript URLs. Some servers and proxy caches cannot cache files with query strings, even with proper cache headers. This optimization can improve caching efficiency significantly.
@@ -105,14 +105,14 @@ Defers the parsing of non-critical JavaScript until it's actually needed. This r
 **4. Advanced Iframe Lazy Loading**
 Prevents iframes from loading until they're visible in the viewport. Since iframes often load external resources beyond your control, lazy loading can dramatically improve initial page performance.
 
-**5. Legacy Script Management (Deprecated)**
-*Note: The old selective JavaScript removal feature that only worked on the front page has been replaced by the comprehensive Asset Manager that works site-wide.*
-
-**6. Legacy Stylesheet Management (Deprecated)**
-*Note: The old selective CSS removal feature that only worked on the front page has been replaced by the comprehensive Asset Manager that works site-wide.*
-
-**7. Modern Image Lazy Loading**
+**5. Modern Image Lazy Loading**
 Implements efficient image lazy loading using modern techniques to improve Core Web Vitals, particularly Largest Contentful Paint (LCP) scores.
+
+**6. CSS Minification (NEW in v3.2)**
+Reduces CSS file sizes by automatically removing unnecessary whitespace, comments, and redundant code. Minified CSS files load faster and consume less bandwidth, improving overall page performance.
+
+**7. JavaScript Minification (NEW in v3.2)**
+Optimizes JavaScript files by removing comments, whitespace, and unnecessary characters without changing functionality. Smaller JS files parse and execute faster, leading to improved page speed scores.ques to improve Core Web Vitals, particularly Largest Contentful Paint (LCP) scores.
 
 ### 🎯 Perfect For
 
@@ -208,10 +208,25 @@ Yes! The plugin is fully compatible with WooCommerce and can significantly impro
 
 1. Basic Settings - Core performance optimizations
 2. Asset Manager - Revolutionary site-wide CSS/JS control
-3. Asset Manager Interface - Visual asset management with one-click toggles
-4. Asset Statistics - Track optimization impact and performance improvements
 
 == Changelog ==
+
+= 3.2 =
+*Release Date: July 25, 2025*
+
+**🚀 New Premium Features & Improvements:**
+* ⚡ **CSS & JS Minification** - New premium features to compress and optimize CSS and JavaScript files
+* 🎯 **Page-wise Asset Management** - Redesigned Asset Manager with accordion interface to group assets by page for easier management
+* 🎨 **Compact UI Design** - More compact styling for Asset Manager to handle large numbers of resources efficiently
+* 💎 **Visual Improvements** - Enhanced icon styling and visual indicators for premium features
+
+**🔧 Technical Enhancements:**
+* 🛡️ **WordPress Coding Standards Compliance** - Complete code quality improvements:
+  * Improved uninstall process with WP_Filesystem API
+  * Fixed database queries with proper escaping and prepared statements
+  * Replaced error_log with WordPress logging methods
+  * Enhanced file handling operations with proper security checks
+* 🔄 **Performance Optimization** - Improved asset processing and caching mechanisms
 
 = 3.1 =
 *Release Date: July 22, 2025*
