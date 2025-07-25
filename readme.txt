@@ -1,4 +1,4 @@
-﻿=== Amigo Performance ===
+=== Amigo Performance ===
 Contributors: AmigoDheena
 Tags: performance, optimization, page speed, caching, lazy loading
 Requires at least: 6.0
@@ -395,9 +395,6 @@ Need help? Here's how to get support:
 * **Documentation**: Check our detailed setup guides
 * **GitHub Issues**: Report bugs or request features
 * **WordPress Support Forum**: Community support
-* **Performance Testing**: We recommend testing changes on staging sites first
-
-**Pro Tip**: Always backup your website before making optimization changes, and test performance improvements using tools like Google PageSpeed Insights.
 
 ---
 
