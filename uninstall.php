@@ -6,7 +6,7 @@
  * It removes all plugin data, options, database tables, and files.
  * 
  * @package amigo-performance
- * @version 3.3
+ * @version 3.4
  */
 
 // Prevent direct access

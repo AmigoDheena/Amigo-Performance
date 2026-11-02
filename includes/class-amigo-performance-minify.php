@@ -5,7 +5,7 @@
  * Handles CSS and JavaScript minification
  * 
  * @package amigo-performance
- * @version 3.3
+ * @version 3.4
  */
 
 if (!defined('ABSPATH')) {
@@ -87,6 +87,11 @@ class AmigoPerformance_Minify {
      * Check if file should be skipped from minification
      */
     private function should_skip_minification($src, $type) {
+        // The toolbar includes URL strings that the simple JS minifier cannot safely parse.
+        if ($type === 'js' && strpos($src, AMIGOPERF_PLUGIN_URL . 'assets/js/admin-bar.js') === 0) {
+            return true;
+        }
+
         // Skip external files
         if (!$this->is_local_file($src)) {
             return true;

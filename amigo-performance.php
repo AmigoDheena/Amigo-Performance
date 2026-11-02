@@ -3,7 +3,7 @@
  * Plugin Name:       Amigo Performance
  * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
  * Description:       A lightweight performance optimization plugin that boosts website speed by removing query strings, disabling emojis, enabling script defer, and implementing lazy loading for images and iframes to improve scores in Google PageSpeed Insights and GTmetrix.
- * Version:           3.3
+ * Version:           3.4
  * Author:            Amigo Dheena
  * Author URI:        https://github.com/AmigoDheena
  * Text Domain:       amigo-performance
@@ -11,7 +11,7 @@
  * License:           GPL v2 or later
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Requires at least: 6.0
- * Tested up to:      6.9
+ * Tested up to:      7.1
  * Requires PHP:      8.0
  * 
  * @package amigo-performance
@@ -29,7 +29,7 @@ include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
 // Define plugin constants
 if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
-    define('AMIGOPERF_PLUGIN_VERSION', '3.3');
+    define('AMIGOPERF_PLUGIN_VERSION', '3.4');
 }
 
 if (!defined('AMIGOPERF_PLUGIN_PATH')) {
@@ -101,7 +101,8 @@ class AmigoPerformancePlugin {
     private $core;
     private $lazyload;
     private $minify;
-    private $asset_manager;
+    /** @var AmigoPerformance_AssetManager Used by the admin component for table recovery. */
+    public $asset_manager;
     private $admin;
     private $settings;
     private $addons;
@@ -255,6 +256,10 @@ class AmigoPerformancePlugin {
      * Register addon (for backward compatibility)
      */
     public function register_addon($addon_id, $addon_data) {
+        if (!is_callable(array($this->addons, 'register_addon'))) {
+            return false;
+        }
+
         return $this->addons->register_addon($addon_id, $addon_data);
     }
     
@@ -262,6 +267,10 @@ class AmigoPerformancePlugin {
      * Check if addon is active (for backward compatibility)
      */
     public function is_addon_active($addon_id) {
+        if (!is_callable(array($this->addons, 'is_addon_active'))) {
+            return false;
+        }
+
         return $this->addons->is_addon_active($addon_id);
     }
     
@@ -269,7 +278,18 @@ class AmigoPerformancePlugin {
      * Get active addons (for backward compatibility)
      */
     public function get_active_addons() {
+        if (!is_callable(array($this->addons, 'get_active_addons'))) {
+            return array();
+        }
+
         return $this->addons->get_active_addons();
+    }
+
+    /**
+     * Expose the optional add-on manager without accessing a private property externally.
+     */
+    public function get_addon_manager() {
+        return $this->addons;
     }
 }
 
@@ -282,7 +302,7 @@ if (class_exists('AmigoPerformancePlugin')) {
     // Make the main plugin instance globally accessible
     global $amigoperf_instance, $amigoperf_addons;
     $amigoperf_instance = $amigoperformanceplugin;
-    $amigoperf_addons = $amigoperformanceplugin->addons ?? null;
+    $amigoperf_addons = $amigoperformanceplugin->get_addon_manager();
     
     // Trigger add-on system hook
     do_action('amigoperf_addons_loaded');

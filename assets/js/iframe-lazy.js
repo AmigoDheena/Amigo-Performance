@@ -1,7 +1,7 @@
 /* 
 * Amigo Performance - Iframe Lazy Loader
 * Author: Amigo Dheena
-* Version: 3.3
+* Version: 3.4
 */
 document.addEventListener("DOMContentLoaded", function() {
     // Get all lazy iframes

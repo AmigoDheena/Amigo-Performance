@@ -3,7 +3,7 @@
  * Lazy Loading Implementation
  * 
  * @package amigo-performance
- * @version 3.3
+ * @version 3.4
  */
 
 if (!defined('ABSPATH')) {
@@ -47,7 +47,7 @@ class AmigoPerformance_LazyLoad {
                 'amigo-lazy-function',
                 plugin_dir_url(dirname(__FILE__)) . 'assets/js/lazy-function.js',
                 array('vanilla-lazyload'),
-                '2.7',
+                AMIGOPERF_PLUGIN_VERSION,
                 true
             );
         });
@@ -110,7 +110,7 @@ class AmigoPerformance_LazyLoad {
                 'amigo-iframe-lazy',
                 plugin_dir_url(dirname(__FILE__)) . 'assets/js/iframe-lazy.js',
                 array(),
-                '2.7',
+                AMIGOPERF_PLUGIN_VERSION,
                 true
             );
         });

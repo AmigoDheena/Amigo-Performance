@@ -1,6 +1,6 @@
 /**
  * Amigo Performance Plugin - Admin JavaScript
- * Version: 3.3
+ * Version: 3.4
  * Author: Amigo Dheena
  */
 

@@ -1,39 +1,160 @@
-/**
- * Asset Manager Admin Bar Styles
- */
-.amigoperf-asset-item .ab-item {
-    padding: 4px 12px !important;
-    white-space: nowrap !important;
-    max-width: 320px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    min-height: 28px !important;
-    line-height: 1.3 !important;
-    transition: all 0.2s ease !important;
+/** Compact toolbar menu, scoped to Amigo; matches the plugin settings UI. */
+#wpadminbar #wp-admin-bar-amigo-performance-main {
+    --amigo-ink: #202b33;
+    --amigo-muted: #586670;
+    --amigo-border: #dce2e6;
+    --amigo-accent: #176b60;
+    --amigo-soft: #edf6f3;
 }
-
-.amigoperf-asset-submenu .ab-item {
-    font-weight: 700 !important;
-    color: #72aee6 !important;
-    background: rgba(0, 0, 0, 0.2) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    text-transform: uppercase !important;
-    font-size: 11px !important;
-    letter-spacing: 0.5px !important;
-    padding: 12px 16px !important;
+#wpadminbar #wp-admin-bar-amigo-performance-main > .ab-item {
+    background: transparent;
+    color: #f0f0f1;
+    font-weight: 500;
 }
-
-.asset-enabled .ab-item { 
-    color: #68d391 !important; 
+#wpadminbar #wp-admin-bar-amigo-performance-main > .ab-item .ab-icon::before { color: #a8d5ca; }
+#wpadminbar #wp-admin-bar-amigo-performance-main:hover > .ab-item,
+#wpadminbar #wp-admin-bar-amigo-performance-main.hover > .ab-item,
+#wpadminbar #wp-admin-bar-amigo-performance-main:focus-within > .ab-item {
+    background: var(--amigo-accent);
+    color: #fff;
 }
-
-.asset-disabled .ab-item { 
-    color: #f56565 !important; 
+#wpadminbar #wp-admin-bar-amigo-performance-main > .ab-sub-wrapper {
+    box-sizing: border-box;
+    width: 360px;
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    max-height: min(560px, calc(100vh - 48px));
+    max-height: min(560px, calc(100dvh - 48px));
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #a5b6b2 #f5f7f8;
+    background: #fff;
+    border: 1px solid var(--amigo-border);
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 8px 24px rgb(32 43 51 / 14%);
+    padding: 6px;
+    margin: 0;
 }
-
-.save-feedback {
-    color: #4CAF50;
+#wpadminbar #wp-admin-bar-amigo-performance-main:focus-within > .ab-sub-wrapper { display: block; }
+#wpadminbar #wp-admin-bar-amigo-performance-main .ab-submenu {
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    background: #fff;
+}
+/* Flatten WordPress flyouts so the entire menu has one scroll container. */
+#wpadminbar #wp-admin-bar-amigo-performance-main .amigoperf-asset-submenu > .ab-sub-wrapper {
+    display: block !important;
+    position: static;
+    float: none;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 6px;
+    box-shadow: none;
+    background: #fff;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main .amigoperf-asset-submenu > .ab-item {
+    height: auto;
+    padding: 8px 10px 6px;
+    background: #f5f7f8;
+    border-radius: 4px;
+    color: var(--amigo-muted);
     font-size: 12px;
-    font-weight: bold;
-    transition: opacity 1s;
+    font-weight: 600;
+    line-height: 20px;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main .amigoperf-asset-submenu > .ab-item::before { display: none; }
+#wpadminbar #wp-admin-bar-amigo-performance-main .wp-admin-bar-arrow { display: none; }
+#wpadminbar #wp-admin-bar-amigo-performance-main .amigoperf-asset-item > .ab-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: auto;
+    min-height: 34px;
+    padding: 0 10px;
+    color: var(--amigo-ink);
+    background: #fff;
+    border-radius: 4px;
+    white-space: normal;
+    text-decoration: none;
+    opacity: 1;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main .amigoperf-asset-item > .ab-item:hover,
+#wpadminbar #wp-admin-bar-amigo-performance-main .amigoperf-asset-item:focus-within > .ab-item { background: var(--amigo-soft); }
+#wpadminbar #wp-admin-bar-amigo-performance-main .asset-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    padding: 8px 0;
+    cursor: pointer;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main .asset-checkbox {
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--amigo-accent);
+    cursor: pointer;
+    box-shadow: none;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main .asset-checkbox::before { content: none; }
+#wpadminbar #wp-admin-bar-amigo-performance-main .asset-name {
+    min-width: 0;
+    color: var(--amigo-ink);
+    font-size: 12px;
+    line-height: 18px;
+    overflow-wrap: anywhere;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main .asset-disabled .asset-name {
+    color: var(--amigo-muted);
+    text-decoration: line-through;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main .save-feedback {
+    flex-shrink: 0;
+    color: var(--amigo-accent);
+    font-size: 11px;
+    line-height: 18px;
+    transition: opacity 150ms ease;
+}
+#wpadminbar #wp-admin-bar-amigoperf-asset-dashboard > .ab-item {
+    height: auto;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--amigo-border);
+    color: var(--amigo-accent);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 20px;
+    background: #fff;
+}
+#wpadminbar #wp-admin-bar-amigoperf-asset-dashboard > .ab-item:hover { background: var(--amigo-soft); }
+#wpadminbar #wp-admin-bar-amigo-performance-main a:focus-visible,
+#wpadminbar #wp-admin-bar-amigo-performance-main input:focus-visible {
+    outline: 2px solid var(--amigo-accent);
+    outline-offset: -2px;
+    box-shadow: none;
+}
+#wpadminbar #wp-admin-bar-amigo-performance-main > .ab-sub-wrapper::-webkit-scrollbar { width: 8px; }
+#wpadminbar #wp-admin-bar-amigo-performance-main > .ab-sub-wrapper::-webkit-scrollbar-track { background: #f5f7f8; }
+#wpadminbar #wp-admin-bar-amigo-performance-main > .ab-sub-wrapper::-webkit-scrollbar-thumb {
+    background: #a5b6b2;
+    border: 2px solid #f5f7f8;
+    border-radius: 8px;
+}
+@media screen and (max-width: 782px) {
+    #wpadminbar li#wp-admin-bar-amigo-performance-main { display: block; }
+    #wpadminbar #wp-admin-bar-amigo-performance-main > .ab-item { font-size: 0; width: 40px; padding: 0 6px; }
+    #wpadminbar #wp-admin-bar-amigo-performance-main > .ab-item .ab-icon { display: block; width: 40px; height: 46px; margin: 0; padding: 0; text-align: center; }
+    #wpadminbar #wp-admin-bar-amigo-performance-main > .ab-item .ab-icon::before { top: 0; font-size: 24px; line-height: 46px; }
+    #wpadminbar #wp-admin-bar-amigo-performance-main > .ab-sub-wrapper { max-height: calc(100dvh - 62px); }
+    #wpadminbar #wp-admin-bar-amigo-performance-main .asset-label { padding: 12px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #wpadminbar #wp-admin-bar-amigo-performance-main .save-feedback { transition: none; }
 }

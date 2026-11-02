@@ -3,7 +3,7 @@
  * Core Performance Optimization Methods
  * 
  * @package amigo-performance
- * @version 3.3
+ * @version 3.4
  */
 
 if (!defined('ABSPATH')) {

@@ -1,14 +1,17 @@
 /*
  * Amigo Performance Plugin - Modern Admin Stylesheet
- * Version: 3.3
+ * Version: 3.4
  * Author: Amigo Dheena
- * Description: Modern, clean, and professional admin interface
+ * Description: WordPress admin styles with a scoped compact presentation layer.
  */
 
 /* ========================================
    RESET & BASE STYLES
 ======================================== */
-* {
+.amigo-wrapper,
+.amigo-wrapper *,
+.amigo-wrapper *::before,
+.amigo-wrapper *::after {
     box-sizing: border-box;
 }
 
@@ -1283,37 +1286,6 @@
     line-height: 1.5;
 }
 
-/* Admin Bar Styles for Asset Manager */
-#wpadminbar .amigoperf-asset-item .ab-item {
-    padding: 4px 12px !important;
-    white-space: nowrap !important;
-    max-width: 320px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    min-height: 28px !important;
-    line-height: 1.3 !important;
-    transition: all 0.2s ease !important;
-}
-
-#wpadminbar .amigoperf-asset-submenu .ab-item {
-    font-weight: 700 !important;
-    color: #72aee6 !important;
-    background: rgba(0, 0, 0, 0.2) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    text-transform: uppercase !important;
-    font-size: 11px !important;
-    letter-spacing: 0.5px !important;
-    padding: 12px 16px !important;
-}
-
-#wpadminbar .asset-enabled .ab-item { 
-    color: #68d391 !important; 
-}
-
-#wpadminbar .asset-disabled .ab-item { 
-    color: #f56565 !important; 
-}
-
 /* Asset Manager Tab Responsive */
 @media (max-width: 768px) {
     .amigo-stats-grid {
@@ -2145,5 +2117,273 @@
     .amigo-am .amigo-btn-small.amigo-btn-secondary {
         font-size: 0.6rem;
         padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Compact admin presentation. Native WP typography; 8px panels, 6px controls.
+   Design variance: 3 / motion: 2 / density: 7. Keep existing state selectors. */
+.amigo-wrapper {
+    --amigo-ink: #202b33;
+    --amigo-muted: #586670;
+    --amigo-border: #dce2e6;
+    --amigo-surface: #fff;
+    --amigo-soft: #f5f7f8;
+    --amigo-accent: #176b60;
+    --amigo-accent-soft: #edf6f3;
+    background: var(--amigo-soft);
+    color: var(--amigo-ink);
+    min-height: 0;
+    padding-bottom: 24px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.amigo-wrapper .amigo-header {
+    background: var(--amigo-surface);
+    color: var(--amigo-surface);
+    padding: 20px 0;
+    border-bottom: 1px solid var(--amigo-border);
+    box-shadow: none;
+}
+.amigo-wrapper .amigo-header-content {
+    max-width: 1200px;
+    padding: 0 24px;
+    gap: 16px;
+}
+.amigo-wrapper .amigo-logo { gap: 12px; min-width: 0; }
+.amigo-wrapper .amigo-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--amigo-accent);
+    backdrop-filter: none;
+}
+.amigo-wrapper .amigo-title {
+    color: var(--amigo-ink);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+    text-shadow: none;
+}
+.amigo-wrapper .amigo-subtitle { color: var(--amigo-muted); font-size: 12px; margin-top: 4px; }
+.amigo-wrapper .amigo-header-meta { gap: 8px; flex-shrink: 0; }
+.amigo-wrapper .amigo-version-badge,
+.amigo-wrapper .amigo-header-status {
+    background: var(--amigo-soft);
+    border: 1px solid var(--amigo-border);
+    border-radius: 6px;
+    color: var(--amigo-muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    padding: 4px 8px;
+    backdrop-filter: none;
+}
+.amigo-wrapper .amigo-header-status { background: var(--amigo-accent-soft); color: var(--amigo-accent); }
+.amigo-wrapper .amigo-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 0;
+}
+.amigo-wrapper .amigo-core-status-bar,
+.amigo-wrapper .amigo-am-overview {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1px solid var(--amigo-border);
+    border-radius: 8px;
+    box-shadow: none;
+    gap: 16px;
+}
+.amigo-wrapper .amigo-core-status-indicator,
+.amigo-wrapper .amigo-am-overview-left { gap: 12px; }
+.amigo-wrapper .amigo-core-status-ring,
+.amigo-wrapper .amigo-am-overview-ring,
+.amigo-wrapper .amigo-core-status-ring svg,
+.amigo-wrapper .amigo-am-overview-ring svg { width: 40px; height: 40px; }
+.amigo-wrapper .amigo-core-status-ring path[stroke-dasharray],
+.amigo-wrapper .amigo-am-overview-ring path[stroke-dasharray] { stroke: var(--amigo-accent); }
+.amigo-wrapper .amigo-core-status-number,
+.amigo-wrapper .amigo-am-overview-number { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.amigo-wrapper .amigo-core-status-text strong,
+.amigo-wrapper .amigo-am-overview-text strong { font-size: 13px; font-weight: 600; }
+.amigo-wrapper .amigo-core-status-text span,
+.amigo-wrapper .amigo-am-overview-text span { color: var(--amigo-muted); font-size: 12px; }
+.amigo-wrapper .amigo-core-section { margin-bottom: 20px; }
+.amigo-wrapper .amigo-core-section-label { padding-left: 0; margin-bottom: 8px; gap: 2px; }
+.amigo-wrapper .amigo-core-section-dot { display: none; }
+.amigo-wrapper .amigo-core-section-label h2 { font-size: 14px; font-weight: 600; }
+.amigo-wrapper .amigo-core-section-label p { font-size: 12px; color: var(--amigo-muted); }
+.amigo-wrapper .amigo-core-cards {
+    gap: 0;
+    border: 1px solid var(--amigo-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--amigo-surface);
+}
+.amigo-wrapper .amigo-core-card,
+.amigo-wrapper .amigo-core-card.is-active {
+    padding: 12px 16px;
+    gap: 16px;
+    border: 0;
+    border-radius: 0;
+    background: var(--amigo-surface);
+    transform: none;
+    box-shadow: none;
+}
+.amigo-wrapper .amigo-core-card + .amigo-core-card { border-top: 1px solid var(--amigo-border); }
+.amigo-wrapper .amigo-core-card:hover { background: #fafcfc; }
+.amigo-wrapper .amigo-core-card::before,
+.amigo-wrapper .amigo-core-card::after,
+.amigo-wrapper .amigo-am-stat-chip::before,
+.amigo-wrapper .amigo-btn-tiny::before,
+.amigo-wrapper .amigo-asset-card::after { display: none; }
+.amigo-wrapper .amigo-core-card-left { gap: 12px; }
+.amigo-wrapper .amigo-core-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    color: var(--amigo-muted);
+    background: var(--amigo-soft);
+    box-shadow: none;
+}
+.amigo-wrapper .is-active .amigo-core-card-icon { color: var(--amigo-accent); background: var(--amigo-accent-soft); }
+.amigo-wrapper .amigo-core-card-icon svg { width: 18px; height: 18px; }
+.amigo-wrapper .amigo-core-card-info h3 { font-size: 13px; margin-bottom: 3px; line-height: 1.4; }
+.amigo-wrapper .amigo-core-card-info p { font-size: 12px; color: var(--amigo-muted); line-height: 1.5; }
+.amigo-wrapper .amigo-toggle { flex-shrink: 0; width: 40px; height: 24px; }
+.amigo-wrapper .amigo-toggle-slider { background: #77858e; transition: background-color 150ms ease; }
+.amigo-wrapper .amigo-toggle-slider::before { box-shadow: none; transition: transform 150ms ease; }
+.amigo-wrapper .amigo-toggle input:checked + .amigo-toggle-slider { background: var(--amigo-accent); }
+.amigo-wrapper .amigo-toggle input:checked + .amigo-toggle-slider::before { transform: translateX(16px); }
+.amigo-wrapper .amigo-toggle:hover .amigo-toggle-slider { box-shadow: 0 0 0 3px #176b6014; }
+.amigo-wrapper .amigo-toggle input:focus-visible + .amigo-toggle-slider,
+.amigo-wrapper a:focus-visible,
+.amigo-wrapper button:focus-visible { outline: 2px solid var(--amigo-accent); outline-offset: 3px; }
+.amigo-wrapper .amigo-btn {
+    min-height: 32px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: none;
+    justify-content: center;
+    box-shadow: none;
+    transform: none;
+    transition: background-color 150ms ease, border-color 150ms ease;
+}
+.amigo-wrapper .amigo-btn-primary { background: var(--amigo-accent); color: #fff; border: 1px solid var(--amigo-accent); }
+.amigo-wrapper .amigo-btn-primary:hover { background: #11564d; color: #fff; }
+.amigo-wrapper .amigo-btn-outline,
+.amigo-wrapper .amigo-btn-secondary { background: #fff; border: 1px solid #bfc9cf; color: var(--amigo-ink); }
+.amigo-wrapper .amigo-btn-outline:hover,
+.amigo-wrapper .amigo-btn-secondary:hover { background: var(--amigo-soft); border-color: #8999a3; }
+.amigo-wrapper .amigo-btn-save {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+    border-radius: 6px !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+.amigo-wrapper .amigo-core-form-footer { margin-top: 16px; padding-top: 16px; border-color: var(--amigo-border); }
+.amigo-wrapper .amigo-am-stats-bar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; margin-bottom: 20px; border: 1px solid var(--amigo-border); border-radius: 8px; background: #fff; overflow: hidden; }
+.amigo-wrapper.amigo-am .amigo-am-stats-bar .amigo-stat-card.amigo-am-stat-chip {
+    align-items: flex-start;
+    padding: 12px 16px;
+    gap: 4px;
+    border: 0;
+    border-radius: 0;
+    min-width: 0;
+    transform: none;
+    box-shadow: none;
+}
+.amigo-wrapper.amigo-am .amigo-am-stats-bar .amigo-am-stat-chip + .amigo-am-stat-chip { border-left: 1px solid var(--amigo-border); }
+.amigo-wrapper.amigo-am .amigo-am-stats-bar .amigo-stat-card .amigo-stat-number { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.amigo-wrapper .amigo-am-stat-label { font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--amigo-muted); font-weight: 400; }
+.amigo-wrapper .amigo-card { border-radius: 8px; border-color: var(--amigo-border); box-shadow: none; transform: none; }
+.amigo-wrapper .amigo-accordion-container { margin-top: 0; }
+.amigo-wrapper .amigo-accordion-header { position: relative; padding: 12px 16px; gap: 12px; background: #fff; }
+.amigo-wrapper .amigo-accordion-header:hover,
+.amigo-wrapper .amigo-accordion-header.active { background: var(--amigo-accent-soft); color: var(--amigo-ink); }
+.amigo-wrapper .amigo-page-info { min-width: 0; }
+.amigo-wrapper .amigo-page-url { font-size: 13px; overflow-wrap: anywhere; }
+.amigo-wrapper .amigo-page-url strong { min-width: 0; }
+.amigo-wrapper .amigo-external-link { color: var(--amigo-accent); opacity: 1; flex-shrink: 0; }
+.amigo-wrapper .amigo-page-summary { align-items: center; flex-wrap: wrap; gap: 8px; opacity: 1; }
+.amigo-wrapper .amigo-asset-count,
+.amigo-wrapper .amigo-accordion-header.active .amigo-asset-count { background: #eef1f3; color: var(--amigo-muted); }
+.amigo-wrapper .amigo-disabled-count,
+.amigo-wrapper .amigo-accordion-header.active .amigo-disabled-count { background: #fff0ed; color: #a23e2d; }
+.amigo-wrapper .amigo-bulk-actions { margin-right: 0; gap: 6px; flex-wrap: wrap; }
+.amigo-wrapper .amigo-btn-tiny { height: auto; min-height: 28px; font-size: 11px; padding: 4px 8px; backdrop-filter: none; }
+.amigo-wrapper .amigo-btn-success,
+.amigo-wrapper .amigo-accordion-header.active .amigo-btn-success { background: #fff; color: var(--amigo-accent); border: 1px solid #9cbbb4; box-shadow: none; transform: none; }
+.amigo-wrapper .amigo-btn-warning,
+.amigo-wrapper .amigo-accordion-header.active .amigo-btn-warning { background: #fff; color: #8c4a18; border: 1px solid #d4b99f; box-shadow: none; transform: none; }
+.amigo-wrapper .amigo-btn-success:hover { background: #e2f0eb; }
+.amigo-wrapper .amigo-btn-warning:hover { background: #fff3e6; }
+.amigo-wrapper .amigo-am-assets-list { padding: 4px 12px; }
+.amigo-wrapper .amigo-asset-card,
+.amigo-wrapper .amigo-asset-card.enabled,
+.amigo-wrapper .amigo-asset-card.disabled { padding: 8px 4px; gap: 12px; background: #fff; border: 0; border-radius: 0; opacity: 1; box-shadow: none; }
+.amigo-wrapper .amigo-asset-card + .amigo-asset-card { border-top: 1px solid #edf0f2; margin-top: 0; }
+.amigo-wrapper .amigo-asset-card:hover { background: #fafcfc; }
+.amigo-wrapper .amigo-am-asset-handle { font-size: 12px; font-weight: 500; }
+.amigo-wrapper .amigo-asset-status { font-size: 11px; text-transform: none; letter-spacing: 0; }
+.amigo-wrapper .amigo-asset-card.enabled .amigo-asset-status { color: var(--amigo-accent); }
+.amigo-wrapper .amigo-asset-card.disabled .amigo-asset-status { color: #a23e2d; }
+.amigo-wrapper .amigo-asset-type-badge { font-size: 10px; letter-spacing: 0; padding: 3px 6px; background: #eef1f3; color: #45545f; }
+.amigo-wrapper .amigo-btn-small.amigo-btn-secondary { font-size: 11px; text-transform: none; letter-spacing: 0; padding: 4px 10px; margin: 0; }
+.amigo-wrapper .amigo-asset-card .amigo-btn-secondary { background: #fff; color: var(--amigo-ink); border-color: #bfc9cf; }
+.amigo-wrapper .amigo-am-btn-icon { width: 32px; min-height: 32px; margin: 0; color: var(--amigo-muted); }
+.amigo-wrapper .amigo-asset-card.deleting { opacity: 0; max-height: 0; padding: 0; margin: 0; border: 0; overflow: hidden; }
+.amigo-wrapper .amigo-empty-state { padding: 32px 20px; border: 1px dashed #bfc9cf; border-radius: 8px; background: #fff; }
+.amigo-wrapper .amigo-empty-icon { color: var(--amigo-muted); }
+.amigo-wrapper .amigo-steps { gap: 16px; margin: 0; }
+.amigo-wrapper .amigo-step-number { width: 28px; height: 28px; background: var(--amigo-accent-soft); color: var(--amigo-accent); border-radius: 6px; }
+.amigo-wrapper .amigo-step-content h4 { font-size: 13px; margin-bottom: 4px; }
+.amigo-wrapper .amigo-step-content p { font-size: 12px; color: var(--amigo-muted); }
+@media (max-width: 782px) {
+    .amigo-wrapper { margin-left: -10px; }
+    .amigo-wrapper .amigo-header-content { padding: 0 16px; flex-direction: row; flex-wrap: wrap; text-align: left; }
+    .amigo-wrapper .amigo-header-meta { flex-direction: row; }
+    .amigo-wrapper .amigo-main { padding: 16px; }
+    .amigo-wrapper .amigo-title { font-size: 20px; }
+    .amigo-wrapper .amigo-core-status-bar,
+    .amigo-wrapper .amigo-am-overview { flex-direction: row; flex-wrap: wrap; text-align: left; }
+    .amigo-wrapper .amigo-core-status-indicator,
+    .amigo-wrapper .amigo-am-overview-left { flex-direction: row; }
+    .amigo-wrapper .amigo-core-status-text,
+    .amigo-wrapper .amigo-am-overview-text { align-items: flex-start; }
+    .amigo-wrapper .amigo-core-card { flex-direction: row; align-items: center; padding: 12px; gap: 12px; }
+    .amigo-wrapper .amigo-core-card .amigo-toggle { align-self: center; }
+    .amigo-wrapper .amigo-core-form-footer { justify-content: flex-end; }
+    .amigo-wrapper .amigo-page-info { display: block; padding-right: 20px; }
+    .amigo-wrapper .amigo-bulk-actions { margin-left: 0; justify-content: flex-start; }
+    .amigo-wrapper .amigo-accordion-arrow { top: 16px; right: 12px; }
+    .amigo-wrapper .amigo-asset-card { flex-wrap: wrap; gap: 8px; }
+    .amigo-wrapper .amigo-am-asset-left { flex-basis: 100%; }
+    .amigo-wrapper .amigo-am-asset-center { margin-left: 0; margin-right: auto; }
+    .amigo-wrapper .amigo-step { flex-direction: row; text-align: left; }
+    .amigo-wrapper .amigo-step-number { align-self: flex-start; }
+}
+@media (max-width: 480px) {
+    .amigo-wrapper .amigo-core-card-icon { display: none; }
+    .amigo-wrapper .amigo-am-stats-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .amigo-wrapper.amigo-am .amigo-am-stats-bar .amigo-am-stat-chip:nth-child(4) { border-left: 0; }
+    .amigo-wrapper.amigo-am .amigo-am-stats-bar .amigo-am-stat-chip:nth-child(n+4) { border-top: 1px solid var(--amigo-border); }
+    .amigo-wrapper .amigo-page-summary { gap: 6px; }
+    .amigo-wrapper .amigo-bulk-actions { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .amigo-wrapper *, .amigo-wrapper *::before, .amigo-wrapper *::after {
+        animation: none !important;
+        transition: none !important;
     }
 }

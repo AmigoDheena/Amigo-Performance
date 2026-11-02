@@ -2,8 +2,8 @@
 Contributors: AmigoDheena
 Tags: performance, optimization, page speed, caching, lazy loading
 Requires at least: 6.0
-Tested up to: 6.9
-Stable tag: 3.3
+Tested up to: 7.1
+Stable tag: 3.4
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ Amigo Performance combines modern UI design with proven performance techniques. 
 
 ### Key capabilities
 
-**Advanced Asset Manager (updated in v3.3)**
+**Advanced Asset Manager (updated in v3.4)**
 - Page-level grouping with redesigned accordions for faster navigation
 - Compact card layout that highlights enabled versus disabled assets
 - Bulk enable/disable controls with detailed statistics, progress rings, and empty-state guidance
@@ -58,7 +58,7 @@ Amigo Performance combines modern UI design with proven performance techniques. 
 4. Configure the available modules from Performance → Amigo Performance.
 
 ### Initial configuration checklist
-1. In the Basic tab, enable the foundational toggles (query string removal, emoji removal, defer, lazy loading) that match your caching stack.
+1. In Core Settings, enable the foundational toggles (query string removal, emoji removal, defer, lazy loading) that match your caching stack.
 2. Use the Asset Manager from the admin menu or admin bar to inspect per-page assets. Disable unnecessary CSS or JavaScript and test the page immediately.
 3. Enable CSS and/or JS minification if you want automatic compression handled by the plugin. Amigo Performance caches minified versions while keeping original files untouched.
 4. Review the “How to Use” guidance from the dashboard whenever no assets are managed yet—this on-screen documentation is designed for onboarding additional team members.
@@ -84,6 +84,18 @@ Sites typically see 20–40 percent faster initial load times and double-digit g
 
 == Changelog ==
 
+= 3.4 =
+Release date: November 2, 2026
+- Refreshed Core Settings and Asset Manager with compact layouts, restrained green accents, clearer typography, and consistent controls
+- Reduced spacing in headers, settings rows, and statistics while retaining existing optimization settings and asset actions
+- Redesigned the frontend admin-bar Asset Manager with a clean dropdown and grouped CSS and JavaScript sections
+- Replaced sideways asset flyouts and nested scrollbars with a single scrollable panel that stays within the viewport
+- Improved long filename wrapping, narrow-screen layouts, keyboard focus visibility, and reduced-motion styling
+- Scoped plugin styles to prevent interference with other WordPress admin screens and consolidated toolbar styling
+- Updated plugin version metadata and asset cache versions consistently for the 3.4 release
+- Normalized the image lazy-loading initializer to UTF-8 without changing its logic
+- Repaired the bundled toolbar script cache and excluded the toolbar script from automatic minification to preserve its JavaScript syntax
+
 = 3.3 =
 Release date: March 1, 2026
 - Complete visual redesign of the Asset Manager, including progress overview, compact stats bar, and modernized accordion layout
@@ -92,8 +104,7 @@ Release date: March 1, 2026
 - WordPress Coding Standards fixes for newly introduced templates, ensuring all dynamic output is escaped
 - General quality-of-life improvements: refined empty states, contextual action buttons, and improved accessibility labels
 
-= 3.3 =
-Release date: July 25, 2025
+Earlier 3.3 changes (July 25, 2025):
 - Added CSS and JavaScript minification controls with cached file handling
 - Introduced page-wise asset grouping, compact view states, and updated iconography in the Asset Manager
 - Improved uninstall routines, database access layers, and filesystem security checks
@@ -135,7 +146,8 @@ Release date: 2023
 
 == Upgrade Notice ==
 
-Version 3.3 introduces a fully redesigned Asset Manager, refreshed Core Settings experience, and updated documentation. Sites running previous versions should upgrade to benefit from the new workflow, consistent escaping, and ongoing maintenance fixes.
+= 3.4 =
+Version 3.4 refreshes Core Settings, Asset Manager, and the frontend admin-bar menu with compact styling and improved dropdown scrolling. Existing optimization settings and saved asset rules are retained. Clear any page or CDN caches after upgrading so the updated styles and scripts are served.
 
 == Support ==
 

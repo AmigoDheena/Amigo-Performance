@@ -3,7 +3,7 @@
  * Admin Menu and Page Management
  * 
  * @package amigo-performance
- * @version 3.3
+ * @version 3.4
  */
 
 if (!defined('ABSPATH')) {
@@ -25,8 +25,8 @@ class AmigoPerformance_Admin {
         add_action('admin_menu', array($this, 'add_admin_pages'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
-        add_action('wp_head', array($this, 'admin_bar_styles'));
-        add_action('admin_head', array($this, 'admin_bar_styles'));
+        add_action('wp_enqueue_scripts', array($this, 'admin_bar_styles'));
+        add_action('admin_enqueue_scripts', array($this, 'admin_bar_styles'));
         
         // Add admin bar menu after everything is loaded
         add_action('admin_bar_menu', array($this, 'add_admin_bar_menu'), 999);
@@ -136,7 +136,7 @@ class AmigoPerformance_Admin {
                     'parent' => 'amigo-performance-main',
                     'id' => 'amigoperf-asset-css',
                     // translators: %d is the number of CSS files
-                    'title' => sprintf('🎨 %s (%d)', __('CSS Files', 'amigo-performance'), count($active_styles)),
+                    'title' => sprintf('%s (%d)', __('CSS Files', 'amigo-performance'), count($active_styles)),
                     'meta' => array('class' => 'amigoperf-asset-submenu amigoperf-scrollable')
                 ));
                 
@@ -167,7 +167,7 @@ class AmigoPerformance_Admin {
                     'parent' => 'amigo-performance-main',
                     'id' => 'amigoperf-asset-js',
                     // translators: %d is the number of JS files
-                    'title' => sprintf('🔧 %s (%d)', __('JS Files', 'amigo-performance'), count($active_scripts)),
+                    'title' => sprintf('%s (%d)', __('JS Files', 'amigo-performance'), count($active_scripts)),
                     'meta' => array('class' => 'amigoperf-asset-submenu amigoperf-scrollable')
                 ));
                 
@@ -186,7 +186,7 @@ class AmigoPerformance_Admin {
         $admin_bar->add_node(array(
             'parent' => 'amigo-performance-main',
             'id' => 'amigoperf-asset-dashboard',
-            'title' => '📊 ' . __('Asset Dashboard', 'amigo-performance'),
+            'title' => __('Asset Dashboard', 'amigo-performance'),
             'href' => admin_url('admin.php?page=amigo_asset_manager'),
             'meta' => array('title' => __('View comprehensive asset statistics and management', 'amigo-performance'))
         ));
@@ -200,14 +200,14 @@ class AmigoPerformance_Admin {
             'amigoperf_style',
             plugins_url('assets/css/style.css', dirname(__FILE__)),
             array(),
-            '3.3'
+            AMIGOPERF_PLUGIN_VERSION
         );
         
         wp_enqueue_script(
             'amigoperf_script',
             plugins_url('assets/js/script.js', dirname(__FILE__)),
             array(),
-            '3.3',
+            AMIGOPERF_PLUGIN_VERSION,
             true
         );
         
@@ -219,7 +219,7 @@ class AmigoPerformance_Admin {
                 'amigoperf-admin-bar',
                 plugins_url('assets/js/admin-bar.js', dirname(__FILE__)),
                 array('jquery'),
-                '3.3',
+                AMIGOPERF_PLUGIN_VERSION,
                 true
             );
             
@@ -244,7 +244,7 @@ class AmigoPerformance_Admin {
                 'amigoperf-admin-bar',
                 plugins_url('assets/js/admin-bar.js', dirname(__FILE__)),
                 array('jquery'),
-                '3.3',
+                AMIGOPERF_PLUGIN_VERSION,
                 true
             );
             
@@ -404,67 +404,15 @@ class AmigoPerformance_Admin {
      * Add admin bar styles
      */
     public function admin_bar_styles() {
-        echo '<style>
-        #wp-admin-bar-amigo-performance-main > .ab-item {
-            background-color: #0073aa !important;
-            color: white !important;
-            font-weight: bold;
+        if (!is_admin_bar_showing() || !current_user_can('manage_options')) {
+            return;
         }
-        
-        #wp-admin-bar-amigo-performance-main:hover > .ab-item {
-            background-color: #005a87 !important;
-        }
-        
-        .amigoperf-scrollable .ab-submenu {
-            max-height: 300px !important;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-        }
-        
-        .amigoperf-scrollable .ab-submenu::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .amigoperf-scrollable .ab-submenu::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-        
-        .amigoperf-scrollable .ab-submenu::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        
-        .amigoperf-scrollable .ab-submenu::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        
-        .amigoperf-asset-item .ab-item {
-            font-size: 12px !important;
-            line-height: 1.3 !important;
-            padding: 3px 12px !important;
-            white-space: nowrap !important;
-        }
-        
-        .amigoperf-asset-item input[type="checkbox"] {
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-        
-        .asset-disabled .ab-item {
-            opacity: 0.6;
-            text-decoration: line-through;
-        }
-        
-        .asset-enabled .ab-item {
-            color: #0f834d;
-        }
-        
-        .amigoperf-asset-submenu > .ab-item {
-            font-weight: bold !important;
-            background-color: #23282d !important;
-            color: #eee !important;
-        }
-        </style>';
+
+        wp_enqueue_style(
+            'amigoperf-admin-bar',
+            plugins_url('assets/css/admin-bar.css', dirname(__FILE__)),
+            array('admin-bar'),
+            AMIGOPERF_PLUGIN_VERSION
+        );
     }
 }

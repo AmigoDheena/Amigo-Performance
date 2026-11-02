@@ -2,7 +2,7 @@
 /**
  * @package amigo-performance
  * Core Settings Admin Page
- * Version: 3.3
+ * Version: 3.4
  */
 
 // Prevent direct access
@@ -29,12 +29,7 @@ if ($plugin_instance->amigoPerf_minify_js_opt) $amigoperf_enabled_count++;
         <div class="amigo-header-content">
             <div class="amigo-logo">
                 <div class="amigo-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M13 10V3.5L18 6V10C18 11.66 16.66 13 15 13C13.34 13 12 11.66 13 10Z" fill="rgba(255,255,255,0.9)"/>
-                        <path d="M6 15V8.5L11 11V15C11 16.66 9.66 18 8 18C6.34 18 5 16.66 6 15Z" fill="rgba(255,255,255,0.6)"/>
-                        <path d="M17 20V13.5L22 16V20C22 21.66 20.66 23 19 23C17.34 23 16 21.66 17 20Z" fill="rgba(255,255,255,0.4)"/>
-                        <path d="M1 20V13.5L6 16V20C6 21.66 4.66 23 3 23C1.34 23 0 21.66 1 20Z" fill="rgba(255,255,255,0.4)"/>
-                    </svg>
+                    <span class="dashicons dashicons-buddicons-activity"></span>
                 </div>
                 <div class="amigo-title-section">
                     <h1 class="amigo-title"><?php echo esc_html($plugin_instance->amigoPerf_PluginName); ?></h1>
