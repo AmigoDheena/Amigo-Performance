@@ -1,6 +1,6 @@
 /*
  * Amigo Performance Plugin - Modern Admin Stylesheet
- * Version: 3.2
+ * Version: 3.3
  * Author: Amigo Dheena
  * Description: Modern, clean, and professional admin interface
  */
@@ -1343,3 +1343,807 @@
     }
 }
 
+/* ========================================
+   CORE SETTINGS – REDESIGNED
+======================================== */
+
+/* Header Meta */
+.amigo-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.amigo-header-status {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 0.45rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Status Overview Bar */
+.amigo-core-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.amigo-core-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.amigo-core-status-ring {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.amigo-core-status-ring svg {
+    transform: rotate(-90deg);
+}
+
+.amigo-core-status-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.amigo-core-status-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.amigo-core-status-text strong {
+    font-size: 0.95rem;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.amigo-core-status-text span {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.amigo-core-status-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.amigo-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.amigo-btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+.amigo-btn-outline svg {
+    stroke: currentColor;
+}
+
+/* Sections */
+.amigo-core-section {
+    margin-bottom: 2.5rem;
+}
+
+.amigo-core-section-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.amigo-core-section-dot {
+    position: absolute;
+    left: 0;
+    top: 0.35rem;
+    width: 4px;
+    height: 1.1rem;
+    border-radius: 4px;
+}
+
+.amigo-core-section-label h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.amigo-core-section-label p {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Cards */
+.amigo-core-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.amigo-core-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.125rem 1.5rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.amigo-core-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 24px rgba(102, 126, 234, 0.12);
+}
+
+.amigo-core-card:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.amigo-core-card:hover::before {
+    opacity: 1;
+}
+
+.amigo-core-card.is-active {
+    border-color: #c7d2fe;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);
+}
+
+.amigo-core-card.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+}
+
+.amigo-core-card-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.amigo-core-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: white;
+    background: var(--icon-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.amigo-core-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.amigo-core-card-info h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.2rem 0;
+    line-height: 1.3;
+}
+
+.amigo-core-card-info p {
+    font-size: 0.775rem;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* Save Button (Core Settings) */
+.amigo-core-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.amigo-btn-save {
+    padding: 0.7rem 2rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    gap: 0.5rem !important;
+    letter-spacing: 0.01em;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.amigo-btn-save:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35) !important;
+}
+
+.amigo-btn-save:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Responsive – Core Settings */
+@media (max-width: 768px) {
+    .amigo-core-status-bar {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.25rem;
+    }
+
+    .amigo-core-status-indicator {
+        flex-direction: column;
+    }
+
+    .amigo-core-status-text {
+        align-items: center;
+    }
+
+    .amigo-core-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .amigo-core-card.is-active::after {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .amigo-core-card .amigo-toggle {
+        align-self: flex-end;
+    }
+
+    .amigo-core-form-footer {
+        justify-content: center;
+    }
+
+    .amigo-header-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .amigo-core-card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+    }
+
+    .amigo-core-card-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .amigo-core-card-info h3 {
+        font-size: 0.85rem;
+    }
+
+    .amigo-core-card-info p {
+        font-size: 0.7rem;
+    }
+}
+
+/* ========================================
+   ASSET MANAGER – REDESIGNED
+======================================== */
+
+/* Status Overview Bar */
+.amigo-am-overview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.amigo-am-overview-left {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.amigo-am-overview-ring {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.amigo-am-overview-ring svg {
+    transform: rotate(-90deg);
+}
+
+.amigo-am-overview-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.amigo-am-overview-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.amigo-am-overview-text strong {
+    font-size: 0.95rem;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.amigo-am-overview-text span {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.amigo-am-overview-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Compact Stats Bar */
+.amigo-am-stats-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.amigo-am .amigo-am-stats-bar .amigo-stat-card.amigo-am-stat-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    box-shadow: none;
+    flex: 1;
+    min-width: 0;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.amigo-am .amigo-am-stats-bar .amigo-stat-card.amigo-am-stat-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-color: #cbd5e1;
+}
+
+.amigo-am .amigo-am-stats-bar .amigo-stat-card .amigo-stat-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.amigo-am-stat-label {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+/* Colored top borders for stat chips */
+.amigo-am-stat-chip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+}
+
+.amigo-am-stat-chip:nth-child(1)::before { background: linear-gradient(90deg, #667eea, #764ba2); }
+.amigo-am-stat-chip:nth-child(2)::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+.amigo-am-stat-chip:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #059669); }
+.amigo-am-stat-chip:nth-child(4)::before { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+.amigo-am-stat-chip:nth-child(5)::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+
+/* Accordion Card Wrapper */
+.amigo-am .amigo-am-accordion-card {
+    padding: 0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.amigo-am .amigo-am-accordion-card:hover {
+    transform: none;
+}
+
+/* Accordion Item Override */
+.amigo-am .amigo-accordion-item {
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.amigo-am .amigo-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.amigo-am .amigo-accordion-item:hover {
+    border-color: #f1f5f9;
+    box-shadow: none;
+}
+
+/* Accordion Header Override */
+.amigo-am .amigo-accordion-header {
+    padding: 1rem 1.5rem;
+    background: #fafbfc;
+    border-bottom: none;
+}
+
+.amigo-am .amigo-accordion-header:hover {
+    background: #f1f5f9;
+}
+
+.amigo-am .amigo-accordion-header.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Page Icon */
+.amigo-am-page-icon {
+    flex-shrink: 0;
+    opacity: 0.5;
+}
+
+.amigo-am .amigo-accordion-header.active .amigo-am-page-icon {
+    opacity: 0.8;
+}
+
+/* Asset List */
+.amigo-am-assets-list {
+    padding: 0.5rem;
+}
+
+/* ---- Asset Card Redesign ---- */
+.amigo-am .amigo-asset-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: #fafbfc;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    font-size: 0.875rem;
+    opacity: 1;
+}
+
+.amigo-am .amigo-asset-card + .amigo-asset-card {
+    margin-top: 4px;
+}
+
+.amigo-am .amigo-asset-card:hover {
+    border-color: #e2e8f0;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Enabled Card */
+.amigo-am .amigo-asset-card.enabled {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(5, 150, 105, 0.02) 100%);
+    border-color: #d1fae5;
+}
+
+.amigo-am .amigo-asset-card.enabled::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(180deg, #10b981, #059669);
+}
+
+/* Disabled Card */
+.amigo-am .amigo-asset-card.disabled {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.02) 0%, rgba(220, 38, 38, 0.01) 100%);
+    border-color: #fee2e2;
+    opacity: 0.78;
+}
+
+.amigo-am .amigo-asset-card.disabled:hover {
+    opacity: 1;
+}
+
+.amigo-am .amigo-asset-card.disabled::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(180deg, #ef4444, #dc2626);
+}
+
+/* Delete animation */
+.amigo-am .amigo-asset-card.deleting {
+    opacity: 0;
+    transform: translateX(-20px);
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    overflow: hidden;
+}
+
+/* Asset Card – Left */
+.amigo-am-asset-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.amigo-am-asset-handle {
+    font-weight: 600;
+    color: #1e293b;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Asset Card – Center (status) */
+.amigo-am-asset-center {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.amigo-am .amigo-status-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.amigo-am .amigo-status-indicator svg {
+    width: 14px;
+    height: 14px;
+}
+
+.amigo-am .amigo-asset-status {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0;
+}
+
+.amigo-am .amigo-asset-card.enabled .amigo-asset-status {
+    color: #059669;
+}
+
+.amigo-am .amigo-asset-card.disabled .amigo-asset-status {
+    color: #dc2626;
+}
+
+/* Asset Card – Actions */
+.amigo-am .amigo-asset-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+}
+
+.amigo-am .amigo-btn-small.amigo-btn-secondary {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.amigo-am .amigo-asset-card.enabled .amigo-btn-secondary {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.amigo-am .amigo-asset-card.enabled .amigo-btn-secondary:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+.amigo-am .amigo-asset-card.disabled .amigo-btn-secondary {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+
+.amigo-am .amigo-asset-card.disabled .amigo-btn-secondary:hover {
+    background: #d1fae5;
+    border-color: #6ee7b7;
+}
+
+.amigo-am .amigo-am-btn-icon {
+    padding: 0.3rem !important;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.amigo-am .amigo-am-btn-icon:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #ef4444;
+}
+
+/* Type Badge Override */
+.amigo-am .amigo-asset-type-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+}
+
+/* ---- Responsive – Asset Manager ---- */
+@media (max-width: 768px) {
+    .amigo-am-overview {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.25rem;
+    }
+
+    .amigo-am-overview-left {
+        flex-direction: column;
+    }
+
+    .amigo-am-overview-text {
+        align-items: center;
+    }
+
+    .amigo-am-stats-bar {
+        flex-wrap: wrap;
+    }
+
+    .amigo-am-stat-chip {
+        min-width: calc(33.33% - 0.5rem);
+    }
+
+    .amigo-am .amigo-asset-card {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .amigo-am-asset-left {
+        width: 100%;
+    }
+
+    .amigo-am-asset-center {
+        margin-left: auto;
+    }
+
+    .amigo-am .amigo-accordion-header {
+        padding: 0.875rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .amigo-am-stat-chip {
+        min-width: calc(50% - 0.5rem);
+    }
+
+    .amigo-am-asset-handle {
+        font-size: 0.7rem;
+    }
+
+    .amigo-am .amigo-btn-small.amigo-btn-secondary {
+        font-size: 0.6rem;
+        padding: 0.25rem 0.5rem;
+    }
+}

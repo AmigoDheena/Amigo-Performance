@@ -3,7 +3,7 @@
  * Admin Menu and Page Management
  * 
  * @package amigo-performance
- * @version 3.2
+ * @version 3.3
  */
 
 if (!defined('ABSPATH')) {
@@ -200,14 +200,14 @@ class AmigoPerformance_Admin {
             'amigoperf_style',
             plugins_url('assets/css/style.css', dirname(__FILE__)),
             array(),
-            '3.2'
+            '3.3'
         );
         
         wp_enqueue_script(
             'amigoperf_script',
             plugins_url('assets/js/script.js', dirname(__FILE__)),
             array(),
-            '3.2',
+            '3.3',
             true
         );
         
@@ -219,7 +219,7 @@ class AmigoPerformance_Admin {
                 'amigoperf-admin-bar',
                 plugins_url('assets/js/admin-bar.js', dirname(__FILE__)),
                 array('jquery'),
-                '3.2',
+                '3.3',
                 true
             );
             
@@ -244,7 +244,7 @@ class AmigoPerformance_Admin {
                 'amigoperf-admin-bar',
                 plugins_url('assets/js/admin-bar.js', dirname(__FILE__)),
                 array('jquery'),
-                '3.2',
+                '3.3',
                 true
             );
             

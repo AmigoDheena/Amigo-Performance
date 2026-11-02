@@ -3,7 +3,7 @@
  * Plugin Name:       Amigo Performance
  * Plugin URI:        https://github.com/AmigoDheena/Amigo-Performance
  * Description:       A lightweight performance optimization plugin that boosts website speed by removing query strings, disabling emojis, enabling script defer, and implementing lazy loading for images and iframes to improve scores in Google PageSpeed Insights and GTmetrix.
- * Version:           3.2
+ * Version:           3.3
  * Author:            Amigo Dheena
  * Author URI:        https://github.com/AmigoDheena
  * Text Domain:       amigo-performance
@@ -29,7 +29,7 @@ include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
 // Define plugin constants
 if (!defined('AMIGOPERF_PLUGIN_VERSION')) {
-    define('AMIGOPERF_PLUGIN_VERSION', '3.2');
+    define('AMIGOPERF_PLUGIN_VERSION', '3.3');
 }
 
 if (!defined('AMIGOPERF_PLUGIN_PATH')) {
@@ -53,16 +53,6 @@ if (!defined('AMIGOPERF_DEBUG')) {
      */
     define('AMIGOPERF_DEBUG', false);
 }
-
-// Load text domain
-function amigoperf_load_textdomain() {
-    load_plugin_textdomain(
-        'amigo-performance',
-        false,
-        dirname(plugin_basename(__FILE__)) . '/languages/'
-    );
-}
-add_action('plugins_loaded', 'amigoperf_load_textdomain', 1);
 
 // Include class files
 require_once AMIGOPERF_PLUGIN_PATH . 'includes/class-amigo-performance-logger.php';
@@ -290,9 +280,9 @@ if (class_exists('AmigoPerformancePlugin')) {
     $amigoperformanceplugin = new AmigoPerformancePlugin();
     
     // Make the main plugin instance globally accessible
-    global $amigo_performance_instance, $amigo_performance_addons;
-    $amigo_performance_instance = $amigoperformanceplugin;
-    $amigo_performance_addons = $amigoperformanceplugin->addons ?? null;
+    global $amigoperf_instance, $amigoperf_addons;
+    $amigoperf_instance = $amigoperformanceplugin;
+    $amigoperf_addons = $amigoperformanceplugin->addons ?? null;
     
     // Trigger add-on system hook
     do_action('amigoperf_addons_loaded');
@@ -305,9 +295,9 @@ register_deactivation_hook(__FILE__, array($amigoperformanceplugin, 'deactivate'
 // Legacy helper functions for add-ons (maintained for backward compatibility)
 if (!function_exists('amigoperf_register_addon')) {
     function amigoperf_register_addon($addon_id, $addon_data) {
-        global $amigo_performance_instance;
-        if ($amigo_performance_instance && method_exists($amigo_performance_instance, 'register_addon')) {
-            return $amigo_performance_instance->register_addon($addon_id, $addon_data);
+        global $amigoperf_instance;
+        if ($amigoperf_instance && method_exists($amigoperf_instance, 'register_addon')) {
+            return $amigoperf_instance->register_addon($addon_id, $addon_data);
         }
         return false;
     }
@@ -315,9 +305,9 @@ if (!function_exists('amigoperf_register_addon')) {
 
 if (!function_exists('amigoperf_is_addon_active')) {
     function amigoperf_is_addon_active($addon_id) {
-        global $amigo_performance_instance;
-        if ($amigo_performance_instance && method_exists($amigo_performance_instance, 'is_addon_active')) {
-            return $amigo_performance_instance->is_addon_active($addon_id);
+        global $amigoperf_instance;
+        if ($amigoperf_instance && method_exists($amigoperf_instance, 'is_addon_active')) {
+            return $amigoperf_instance->is_addon_active($addon_id);
         }
         return false;
     }
@@ -325,9 +315,9 @@ if (!function_exists('amigoperf_is_addon_active')) {
 
 if (!function_exists('amigoperf_get_active_addons')) {
     function amigoperf_get_active_addons() {
-        global $amigo_performance_instance;
-        if ($amigo_performance_instance && method_exists($amigo_performance_instance, 'get_active_addons')) {
-            return $amigo_performance_instance->get_active_addons();
+        global $amigoperf_instance;
+        if ($amigoperf_instance && method_exists($amigoperf_instance, 'get_active_addons')) {
+            return $amigoperf_instance->get_active_addons();
         }
         return array();
     }

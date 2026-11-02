@@ -6,7 +6,7 @@
  * It removes all plugin data, options, database tables, and files.
  * 
  * @package amigo-performance
- * @version 3.2
+ * @version 3.3
  */
 
 // Prevent direct access
@@ -56,24 +56,24 @@ delete_option('amigoperf_error_log');              // Error logs (if implemented
  */
 
 // Asset Manager table
-$asset_manager_table = $wpdb->prefix . 'amigoperf_asset_manager';
+$amigoperf_asset_manager_table = $wpdb->prefix . 'amigoperf_asset_manager';
 
 // Clear any cached table existence checks before dropping
-wp_cache_delete('amigoperf_table_exists_' . $asset_manager_table);
-wp_cache_delete($asset_manager_table, 'amigoperf_tables');
+wp_cache_delete('amigoperf_table_exists_' . $amigoperf_asset_manager_table);
+wp_cache_delete($amigoperf_asset_manager_table, 'amigoperf_tables');
 
 // Sanitize table name and execute drop query
 // Note: Table names cannot be used with $wpdb->prepare() placeholders
-$table_name = esc_sql($asset_manager_table);
+$amigoperf_table_name = esc_sql($amigoperf_asset_manager_table);
 
 // Validate table name format for security
-if (preg_match('/^[a-zA-Z0-9_]+$/', $table_name)) {
+if (preg_match('/^[a-zA-Z0-9_]+$/', $amigoperf_table_name)) {
     // For DDL operations like DROP TABLE, WordPress core itself uses this pattern
     // Table names cannot be placeholders in prepared statements
     
     // phpcs:disable WordPress.DB -- The following approach is used by WordPress core for dropping tables
-    $query = "DROP TABLE IF EXISTS `$table_name`";
-    $wpdb->query($query);
+    $amigoperf_query = "DROP TABLE IF EXISTS `$amigoperf_table_name`";
+    $wpdb->query($amigoperf_query);
     // phpcs:enable WordPress.DB
 }
 
@@ -83,19 +83,19 @@ if (preg_match('/^[a-zA-Z0-9_]+$/', $table_name)) {
  */
 
 // Clear all plugin-related cache entries
-$cache_keys_to_clear = array(
+$amigoperf_cache_keys_to_clear = array(
   'amigoperf_stats',
-  'amigoperf_table_exists_' . $asset_manager_table,
+  'amigoperf_table_exists_' . $amigoperf_asset_manager_table,
   'amigoperf_dequeued_assets_*', // Pattern - actual keys vary by URL
 );
 
-foreach ($cache_keys_to_clear as $cache_key) {
-  if (strpos($cache_key, '*') !== false) {
+foreach ($amigoperf_cache_keys_to_clear as $amigoperf_cache_key) {
+  if (strpos($amigoperf_cache_key, '*') !== false) {
     // For pattern-based cache keys, we'll use wp_cache_flush for safety
     wp_cache_flush();
     break;
   } else {
-    wp_cache_delete($cache_key);
+    wp_cache_delete($amigoperf_cache_key);
   }
 }
 
@@ -181,10 +181,10 @@ flush_rewrite_rules();
  */
 
 // Clear any user meta that might have been set
-$users = get_users(array('fields' => 'ID'));
-foreach ($users as $user_id) {
-    delete_user_meta($user_id, 'amigoperf_hide_notices');
-    delete_user_meta($user_id, 'amigoperf_preferences');
+$amigoperf_users = get_users(array('fields' => 'ID'));
+foreach ($amigoperf_users as $amigoperf_user_id) {
+    delete_user_meta($amigoperf_user_id, 'amigoperf_hide_notices');
+    delete_user_meta($amigoperf_user_id, 'amigoperf_preferences');
 }
 
 /**
@@ -209,11 +209,11 @@ if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) 
         wp_debug_log('Amigo Performance: Plugin uninstall cleanup completed successfully');
     } else {
         // Fallback to WordPress file system for logging
-        $log_message = gmdate('[Y-m-d H:i:s] ') . 'Amigo Performance: Plugin uninstall cleanup completed successfully' . PHP_EOL;
+        $amigoperf_log_message = gmdate('[Y-m-d H:i:s] ') . 'Amigo Performance: Plugin uninstall cleanup completed successfully' . PHP_EOL;
         if (defined('WP_DEBUG_LOG') && is_string(WP_DEBUG_LOG)) {
-            $log_file = WP_DEBUG_LOG;
+            $amigoperf_log_file = WP_DEBUG_LOG;
         } else {
-            $log_file = WP_CONTENT_DIR . '/debug.log';
+            $amigoperf_log_file = WP_CONTENT_DIR . '/debug.log';
         }
         
         // Use WordPress filesystem for writing
@@ -223,12 +223,12 @@ if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) 
             WP_Filesystem();
         }
         
-        if ($wp_filesystem && $wp_filesystem->is_writable(dirname($log_file))) {
-            $existing_content = '';
-            if ($wp_filesystem->exists($log_file)) {
-                $existing_content = $wp_filesystem->get_contents($log_file);
+        if ($wp_filesystem && $wp_filesystem->is_writable(dirname($amigoperf_log_file))) {
+            $amigoperf_existing_content = '';
+            if ($wp_filesystem->exists($amigoperf_log_file)) {
+                $amigoperf_existing_content = $wp_filesystem->get_contents($amigoperf_log_file);
             }
-            $wp_filesystem->put_contents($log_file, $existing_content . $log_message, FS_CHMOD_FILE);
+            $wp_filesystem->put_contents($amigoperf_log_file, $amigoperf_existing_content . $amigoperf_log_message, FS_CHMOD_FILE);
         }
     }
 }
