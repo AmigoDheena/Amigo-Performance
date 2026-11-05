@@ -79,8 +79,9 @@ Sites typically see 20–40 percent faster initial load times and double-digit g
 
 == Screenshots ==
 
-1. Core Settings panel with grouped optimization toggles
-2. Asset Manager interface with accordion-based per-page controls
+1. Performance optimization Made Simple
+2. Asset Manager | Control CSS and JS per page
+3. Quick Access from the admin bar | Manage CSS and JS without leaving the page
 
 == Changelog ==
 
