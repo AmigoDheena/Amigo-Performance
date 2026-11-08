@@ -43,21 +43,25 @@ class AmigoPerformance_Logger {
             // In debug mode, we can use WordPress logging functions
             if (function_exists('wp_debug_log')) {
                 wp_debug_log($formatted_message);
-            } elseif (defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-                // Use WordPress file system APIs for logging instead of error_log
-                if (function_exists('wp_mkdir_p') && function_exists('wp_normalize_path')) {
-                    $log_path = is_string(WP_DEBUG_LOG) ? WP_DEBUG_LOG : WP_CONTENT_DIR . '/debug.log';
-                    $log_dir = dirname($log_path);
-                    
-                    // Create log directory if it doesn't exist
-                    wp_mkdir_p($log_dir);
-                    
-                    // Append to the log file using WP file system methods
-                    @file_put_contents(
-                        wp_normalize_path($log_path),
-                        gmdate('[Y-m-d H:i:s]') . ' ' . $formatted_message . PHP_EOL,
-                        FILE_APPEND
-                    );
+            } elseif (
+                defined('WP_DEBUG_LOG') && WP_DEBUG_LOG &&
+                function_exists('wp_upload_dir') && function_exists('wp_mkdir_p')
+            ) {
+                // Store fallback logs in uploads so plugin upgrades cannot delete them.
+                $upload_dir = wp_upload_dir();
+
+                if (empty($upload_dir['error']) && !empty($upload_dir['basedir'])) {
+                    $log_dir = trailingslashit($upload_dir['basedir']) . 'amigo-performance';
+
+                    if (wp_mkdir_p($log_dir)) {
+                        $log_path = trailingslashit($log_dir) . 'debug.log';
+
+                        file_put_contents(
+                            $log_path,
+                            gmdate('[Y-m-d H:i:s]') . ' ' . $formatted_message . PHP_EOL,
+                            FILE_APPEND | LOCK_EX
+                        );
+                    }
                 }
             }
         } 
